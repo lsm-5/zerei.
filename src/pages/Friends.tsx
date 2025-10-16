@@ -16,31 +16,86 @@ const FriendsPage = () => {
   const { session } = useAuth();
   const [friends, setFriends] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
+  const [sentRequests, setSentRequests] = useState<any[]>([]);
   const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
 
   const fetchFriends = useCallback(async () => {
     if (!session) return;
 
-    const { data, error } = await supabase
+    // Buscar todas as amizades onde o usuário está envolvido
+    const { data: friendships, error: friendshipsError } = await supabase
       .from('friendships')
-      .select('*, user_one:profiles!user_one_id(*), user_two:profiles!user_two_id(*)')
+      .select('*')
       .or(`user_one_id.eq.${session.user.id},user_two_id.eq.${session.user.id}`);
 
-    if (error) {
-      console.error("Error fetching friends:", error);
+    if (friendshipsError) {
+      console.error("Error fetching friendships:", friendshipsError);
       return;
     }
 
-    const acceptedFriends = data
+    if (!friendships || friendships.length === 0) {
+      setFriends([]);
+      setRequests([]);
+      setSentRequests([]);
+      return;
+    }
+
+    // Coletar todos os IDs únicos de usuários
+    const userIds = new Set();
+    friendships.forEach(f => {
+      userIds.add(f.user_one_id);
+      userIds.add(f.user_two_id);
+    });
+
+    // Buscar todos os perfis
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', Array.from(userIds));
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+      return;
+    }
+
+    // Criar mapa de ID para perfil
+    const profileMap = new Map();
+    profiles?.forEach(profile => {
+      profileMap.set(profile.id, profile);
+    });
+
+    // Processar amizades aceitas
+    const acceptedFriends = friendships
       .filter(f => f.status === 'accepted')
-      .map(f => f.user_one_id === session.user.id ? f.user_two : f.user_one);
-    
-    const pendingRequests = data
+      .map(f => {
+        const friendId = f.user_one_id === session.user.id ? f.user_two_id : f.user_one_id;
+        return profileMap.get(friendId);
+      })
+      .filter(Boolean);
+
+    // Processar solicitações recebidas (pendentes onde o usuário atual não é o action_user)
+    const pendingRequests = friendships
       .filter(f => f.status === 'pending' && f.action_user_id !== session.user.id)
-      .map(f => ({ ...f.user_one, friendship: f }));
+      .map(f => {
+        const requesterId = f.user_one_id === session.user.id ? f.user_two_id : f.user_one_id;
+        const profile = profileMap.get(requesterId);
+        return profile ? { ...profile, friendship: f } : null;
+      })
+      .filter(Boolean);
+
+    // Processar solicitações enviadas (pendentes onde o usuário atual é o action_user)
+    const sentRequests = friendships
+      .filter(f => f.status === 'pending' && f.action_user_id === session.user.id)
+      .map(f => {
+        const targetId = f.user_one_id === session.user.id ? f.user_two_id : f.user_one_id;
+        const profile = profileMap.get(targetId);
+        return profile ? { ...profile, friendship: f } : null;
+      })
+      .filter(Boolean);
 
     setFriends(acceptedFriends);
     setRequests(pendingRequests);
+    setSentRequests(sentRequests);
   }, [session]);
 
   useEffect(() => {
@@ -50,14 +105,33 @@ const FriendsPage = () => {
   const handleFriendAction = async (friendship: any, newStatus: 'accepted' | 'declined') => {
     const { error } = await supabase
       .from('friendships')
-      .update({ status: newStatus, action_user_id: session?.user.id })
-      .eq('user_one_id', friendship.user_one_id)
-      .eq('user_two_id', friendship.user_two_id);
+      .update({ 
+        status: newStatus, 
+        action_user_id: session?.user.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', friendship.id);
 
     if (error) {
       showError(`Não foi possível ${newStatus === 'accepted' ? 'aceitar' : 'recusar'} a solicitação.`);
+      console.error('Error updating friendship:', error);
     } else {
       showSuccess(`Solicitação ${newStatus === 'accepted' ? 'aceita' : 'recusada'}!`);
+      fetchFriends();
+    }
+  };
+
+  const handleCancelSentRequest = async (friendship: any) => {
+    const { error } = await supabase
+      .from('friendships')
+      .delete()
+      .eq('id', friendship.id);
+
+    if (error) {
+      showError("Não foi possível cancelar a solicitação.");
+      console.error('Error canceling friendship:', error);
+    } else {
+      showSuccess("Solicitação cancelada!");
       fetchFriends();
     }
   };
@@ -69,30 +143,80 @@ const FriendsPage = () => {
       return showError("Você não pode adicionar a si mesmo.");
     }
 
-    const { data: friendData, error: rpcError } = await supabase.rpc('get_profile_by_email', { p_email: email });
-
-    if (rpcError || !friendData || friendData.length === 0) {
-      return showError("Usuário não encontrado com este email.");
-    }
-    const friendProfile = friendData[0];
-
-    const { error: insertError } = await supabase.from('friendships').insert({
-      user_one_id: session.user.id,
-      user_two_id: friendProfile.id,
-      status: 'pending',
-      action_user_id: session.user.id,
-    });
-
-    if (insertError) {
-      if (insertError.code === '23505') {
-        showError("Você já enviou uma solicitação para este usuário ou já são amigos.");
-      } else {
-        showError("Erro ao enviar solicitação.");
+    try {
+      // 1. Buscar o perfil do usuário pelo email
+      const { data: profileData, error: rpcError } = await supabase.rpc('get_profile_by_email', { p_email: email });
+      
+      if (rpcError) {
+        console.error('RPC Error:', rpcError);
+        return showError("Erro ao verificar usuário. Tente novamente.");
       }
-    } else {
-      showSuccess(`Solicitação de amizade enviada para ${friendProfile.name || email}!`);
+      
+      if (!profileData || profileData.length === 0) {
+        return showError("Usuário não encontrado com este email. Verifique se o email está correto e se o usuário já se cadastrou.");
+      }
+      
+      const targetProfile = profileData[0];
+      
+      // 2. Verificar se já existe uma amizade entre os usuários
+      const { data: existingFriendship, error: checkError } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`and(user_one_id.eq.${session.user.id},user_two_id.eq.${targetProfile.id}),and(user_one_id.eq.${targetProfile.id},user_two_id.eq.${session.user.id})`)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error checking existing friendship:', checkError);
+        return showError("Erro ao verificar amizade existente.");
+      }
+
+      // 3. Se já existe uma amizade, verificar o status
+      if (existingFriendship) {
+        switch (existingFriendship.status) {
+          case 'pending':
+            if (existingFriendship.action_user_id === session.user.id) {
+              return showError("Você já enviou uma solicitação para este usuário. Aguarde a resposta.");
+            } else {
+              return showError("Este usuário já enviou uma solicitação para você. Verifique suas solicitações pendentes.");
+            }
+          case 'accepted':
+            return showError("Vocês já são amigos!");
+          case 'declined':
+            // Permitir reenviar solicitação se foi recusada
+            break;
+        }
+      }
+
+      // 4. Criar nova solicitação de amizade
+      // Sempre colocar o ID menor como user_one_id para evitar duplicatas
+      const userOneId = session.user.id < targetProfile.id ? session.user.id : targetProfile.id;
+      const userTwoId = session.user.id < targetProfile.id ? targetProfile.id : session.user.id;
+
+      const { error: insertError } = await supabase.from('friendships').insert({
+        user_one_id: userOneId,
+        user_two_id: userTwoId,
+        status: 'pending',
+        action_user_id: session.user.id, // Quem está enviando a solicitação
+      });
+
+      if (insertError) {
+        if (insertError.code === '23505') {
+          showError("Solicitação já existe entre vocês.");
+        } else {
+          showError("Erro ao enviar solicitação de amizade.");
+          console.error('Insert error:', insertError);
+        }
+      } else {
+        showSuccess(`Solicitação de amizade enviada para ${targetProfile.name || email}!`);
+        // Atualizar a lista de amigos
+        fetchFriends();
+      }
+    } catch (exception) {
+      console.error('Exception in handleAddFriend:', exception);
+      return showError("Erro inesperado. Tente novamente.");
     }
   };
+
 
   return (
     <Layout>
@@ -111,9 +235,10 @@ const FriendsPage = () => {
         </div>
 
         <Tabs defaultValue="friends">
-          <TabsList className="grid w-full grid-cols-2 sm:w-96">
+          <TabsList className="grid w-full grid-cols-3 sm:w-96">
             <TabsTrigger value="friends">Meus Amigos ({friends.length})</TabsTrigger>
             <TabsTrigger value="requests">Solicitações ({requests.length})</TabsTrigger>
+            <TabsTrigger value="sent">Enviados ({sentRequests.length})</TabsTrigger>
           </TabsList>
           
           <TabsContent value="friends" className="mt-6">
@@ -160,6 +285,36 @@ const FriendsPage = () => {
                 </Card>
               ))}
               {requests.length === 0 && <p className="text-muted-foreground text-center py-8">Nenhuma solicitação de amizade pendente.</p>}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sent" className="mt-6">
+            <div className="space-y-4">
+              {sentRequests.map(request => (
+                <Card key={request.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={request.avatar_url} alt={request.name} />
+                        <AvatarFallback>{request.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold">{request.name}</p>
+                        <p className="text-sm text-muted-foreground">Aguardando resposta...</p>
+                      </div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleCancelSentRequest(request.friendship)}
+                    >
+                      <UserX className="mr-2 h-4 w-4" />
+                      Cancelar
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+              {sentRequests.length === 0 && <p className="text-muted-foreground text-center py-8">Nenhuma solicitação enviada.</p>}
             </div>
           </TabsContent>
         </Tabs>
