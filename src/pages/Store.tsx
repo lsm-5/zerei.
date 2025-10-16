@@ -84,8 +84,8 @@ const StorePage = () => {
                 className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer aspect-[9/14]"
                 onClick={() => setSelectedCollection(collection)}
               >
-                <div className={`absolute z-10 transform -rotate-45 ${collection.price === 0 ? 'bg-green-600' : 'bg-blue-600'} text-center text-white font-semibold py-1 left-[-35px] top-[22px] w-[160px] shadow-lg text-sm`}>
-                  {collection.price === 0 ? 'Grátis' : `R$ ${collection.price.toFixed(2).replace('.', ',')}`}
+                <div className={`absolute z-10 transform -rotate-45 ${(collection.price || 0) === 0 ? 'bg-green-600' : 'bg-blue-600'} text-center text-white font-semibold py-1 left-[-35px] top-[22px] w-[160px] shadow-lg text-sm`}>
+                  {(collection.price || 0) === 0 ? 'Grátis' : `R$ ${(collection.price || 0).toFixed(2).replace('.', ',')}`}
                 </div>
 
                 <img 

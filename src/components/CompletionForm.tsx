@@ -40,16 +40,16 @@ const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCar
         <DatePicker date={date} setDate={setDate} />
       </div>
       <div>
-        <Label htmlFor="comment">Comentário do Card (opcional)</Label>
+        <Label htmlFor="comment">Como foi sua experiência?</Label>
         <Textarea
           id="comment"
-          placeholder="O que você achou desta experiência?"
+          placeholder="Como foi sua experiência?"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={3}
         />
         <p className="text-xs text-muted-foreground text-center pt-1">
-          Seu comentário poderá aparecer no feed de atividades.
+          Sua experiência será exibida como descrição do post no feed.
         </p>
       </div>
       {isLastCard && (

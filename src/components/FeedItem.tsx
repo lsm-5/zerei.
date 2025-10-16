@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,8 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from "@/lib/utils";
 import { useCollectionStore } from "@/contexts/CollectionStoreContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from '@/integrations/supabase/client';
+import { getInitials, getDisplayName } from '@/utils/avatarHelpers';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,35 +59,103 @@ const FeedItem = ({ item }: FeedItemProps) => {
   const { user, type, data, timestamp, comments } = item;
   const { session } = useAuth();
   const currentUser = session?.user;
-  const { activeCollections, archivedCollections, addCommentToFeedItem, removeCommentFromFeedItem, likedCollections, toggleLikeCollection } = useCollectionStore();
+  const { activeCollections, archivedCollections, likeActivity, unlikeActivity, addCommentToActivity, removeCommentFromActivity } = useCollectionStore();
   
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-
-  const isLiked = likedCollections.has(data.collectionId);
-  const likeCount = isLiked ? 1 : 0;
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [activityComments, setActivityComments] = useState<any[]>([]);
 
   const userCollectionInstance = [...activeCollections, ...archivedCollections].find(c => c.id === data.collectionId);
   const userHasCollection = !!userCollectionInstance;
 
-  const handleLike = () => {
-    toggleLikeCollection(data.collectionId);
+  // Carregar likes e comentários do banco
+  useEffect(() => {
+    const loadActivityData = async () => {
+      if (!session) return;
+
+      try {
+        // Carregar likes
+        const { data: likesData, error: likesError } = await supabase
+          .from('activity_likes')
+          .select('user_id')
+          .eq('activity_id', item.id);
+
+        if (!likesError && likesData) {
+          const userLiked = likesData.some(like => like.user_id === session.user.id);
+          setIsLiked(userLiked);
+          setLikeCount(likesData.length);
+        }
+
+        // Carregar comentários
+        const { data: commentsData, error: commentsError } = await supabase
+          .from('activity_comments')
+          .select(`
+            id,
+            comment,
+            created_at,
+            user_id,
+            profiles!inner(name, avatar_url)
+          `)
+          .eq('activity_id', item.id)
+          .is('removed_at', null)
+          .order('created_at', { ascending: true });
+
+        if (!commentsError && commentsData) {
+          const formattedComments = commentsData.map(comment => ({
+            id: comment.id,
+            user: {
+              id: comment.user_id,
+              name: comment.profiles.name,
+              avatar: comment.profiles.avatar_url || `https://api.dicebear.com/8.x/lorelei/svg?seed=${comment.user_id}`
+            },
+            text: comment.comment,
+            createdAt: comment.created_at
+          }));
+          setActivityComments(formattedComments);
+        }
+      } catch (error) {
+        console.error('Error loading activity data:', error);
+      }
+    };
+
+    loadActivityData();
+  }, [item.id, session]);
+
+  const handleLike = async () => {
+    if (isLiked) {
+      const success = await unlikeActivity(item.id);
+      if (success) {
+        setIsLiked(false);
+        setLikeCount(prev => Math.max(0, prev - 1));
+      }
+    } else {
+      const success = await likeActivity(item.id);
+      if (success) {
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+      }
+    }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() && currentUser) {
-      const commentToAdd = {
-        id: Date.now(),
-        user: { 
-          id: currentUser.id,
-          name: currentUser.user_metadata.name, 
-          avatar: `https://api.dicebear.com/8.x/lorelei/svg?seed=${currentUser.email}` 
-        },
-        text: newComment.trim(),
-      };
-      addCommentToFeedItem(item.id, commentToAdd);
-      setNewComment("");
+      const success = await addCommentToActivity(item.id, newComment.trim());
+      if (success) {
+        const commentToAdd = {
+          id: Date.now(),
+          user: { 
+            id: currentUser.id,
+            name: currentUser.user_metadata.name, 
+            avatar: `https://api.dicebear.com/8.x/lorelei/svg?seed=${currentUser.email}` 
+          },
+          text: newComment.trim(),
+        };
+        setActivityComments(prev => [...prev, commentToAdd]);
+        setNewComment("");
+      }
     }
   };
 
@@ -146,10 +216,10 @@ const FeedItem = ({ item }: FeedItemProps) => {
         <Link to={`/perfil/${user.id}`} className="flex items-center gap-4 group flex-1">
           <Avatar>
             <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold group-hover:text-primary transition-colors">{user.name}</p>
+            <p className="font-semibold group-hover:text-primary transition-colors">{getDisplayName(user.name, user.email)}</p>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ptBR })}
             </p>
@@ -203,7 +273,7 @@ const FeedItem = ({ item }: FeedItemProps) => {
             <Heart className={cn("mr-2 h-4 w-4", isLiked && "fill-red-500 text-red-500")} /> {likeCount}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setShowComments(!showComments)}>
-            <MessageCircle className="mr-2 h-4 w-4" /> {comments?.filter(c => !c.removedAt).length || 0}
+            <MessageCircle className="mr-2 h-4 w-4" /> {activityComments.length}
           </Button>
         </div>
       </CardFooter>
@@ -219,16 +289,16 @@ const FeedItem = ({ item }: FeedItemProps) => {
             <Button type="submit" disabled={!newComment.trim()}>Enviar</Button>
           </form>
           <div className="mt-4 space-y-4 max-h-60 overflow-y-auto pr-2">
-            {comments?.filter(comment => !comment.removedAt).map((comment, index) => (
+            {activityComments.map((comment, index) => (
               <div key={comment.id || index} className="flex items-start gap-3 group">
                 <Link to={`/perfil/${comment.user.id}`}>
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
-                    <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{getInitials(comment.user.name)}</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div className="bg-muted/50 p-2 rounded-lg flex-1">
-                  <Link to={`/perfil/${comment.user.id}`} className="font-semibold text-sm hover:underline">{comment.user.name}</Link>
+                  <Link to={`/perfil/${comment.user.id}`} className="font-semibold text-sm hover:underline">{getDisplayName(comment.user.name, comment.user.email)}</Link>
                   <p className="text-sm">{comment.text}</p>
                 </div>
                 {comment.user.id === currentUser?.id && (

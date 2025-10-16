@@ -253,7 +253,9 @@ const FriendsPage = () => {
                           <AvatarFallback className="text-2xl">{friend.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
                       </Link>
-                      <Link to={`/perfil/${friend.id}`} className="font-semibold hover:underline">{friend.name}</Link>
+                      <Link to={`/perfil/${friend.id}`} className="font-semibold hover:underline truncate max-w-full block" title={friend.name || friend.email}>
+                        {friend.name || friend.email}
+                      </Link>
                     </CardContent>
                   </Card>
                 ))}
@@ -275,7 +277,9 @@ const FriendsPage = () => {
                         <AvatarImage src={request.avatar_url} alt={request.name} />
                         <AvatarFallback>{request.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <p className="font-semibold">{request.name}</p>
+                      <p className="font-semibold truncate max-w-full" title={request.name || request.email}>
+                        {request.name || request.email}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Button size="icon" onClick={() => handleFriendAction(request.friendship, 'accepted')}><UserCheck className="h-4 w-4" /></Button>
@@ -299,7 +303,9 @@ const FriendsPage = () => {
                         <AvatarFallback>{request.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold">{request.name}</p>
+                        <p className="font-semibold truncate max-w-full" title={request.name || request.email}>
+                          {request.name || request.email}
+                        </p>
                         <p className="text-sm text-muted-foreground">Aguardando resposta...</p>
                       </div>
                     </div>

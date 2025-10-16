@@ -8,6 +8,7 @@ interface CardData {
   id: number;
   title: string;
   image: string;
+  cover?: string;
 }
 
 interface CollectionCardListItemProps {

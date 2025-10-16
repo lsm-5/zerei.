@@ -7,6 +7,8 @@ import { MessageSquare, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollectionStore } from '@/contexts/CollectionStoreContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { getInitials, getDisplayName } from '@/utils/avatarHelpers';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,27 +23,25 @@ import {
 
 interface Comment {
   id: string | number;
-  user: {
-    id: number;
-    name: string;
-    avatar: string;
-  };
-  commentText: string;
-  timestamp: string;
-  isPrimary: boolean;
-  feedItemId: number;
-  commentId?: number;
-  isMainComment: boolean;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_avatar: string;
+  comment_text: string;
+  activity_type: string;
+  activity_id: number;
+  card_id?: number;
+  card_title?: string;
+  is_main_comment: boolean;
+  created_at: string;
 }
 
 interface CollectionCommentsProps {
   comments: Comment[];
 }
 
-const MOCK_USER_ID = 99;
-
 const CollectionComments = ({ comments }: CollectionCommentsProps) => {
-  const { removeCommentFromFeedItem, removeMainCommentFromFeedItem } = useCollectionStore();
+  const { removeCommentFromActivity } = useCollectionStore();
 
   if (!comments || comments.length === 0) {
     return (
@@ -57,11 +57,22 @@ const CollectionComments = ({ comments }: CollectionCommentsProps) => {
     );
   }
 
+  const getActivityTypeBadge = (activityType: string, cardTitle?: string) => {
+    switch (activityType) {
+      case 'acquired_collection':
+        return <Badge variant="secondary" className="text-xs">Obteve coleção</Badge>;
+      case 'completed_card':
+        return <Badge variant="outline" className="text-xs">Completou {cardTitle}</Badge>;
+      case 'completed_collection':
+        return <Badge variant="default" className="text-xs">Concluiu coleção</Badge>;
+      default:
+        return null;
+    }
+  };
+
   const handleDelete = (comment: Comment) => {
-    if (comment.isMainComment) {
-      removeMainCommentFromFeedItem(comment.feedItemId);
-    } else if (comment.commentId) {
-      removeCommentFromFeedItem(comment.feedItemId, comment.commentId);
+    if (!comment.is_main_comment) {
+      removeCommentFromActivity(comment.id as number);
     }
   };
 
@@ -76,22 +87,25 @@ const CollectionComments = ({ comments }: CollectionCommentsProps) => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <Avatar>
-                <AvatarImage src={comment.user.avatar} />
-                <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={comment.user_avatar} />
+                <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-sm font-semibold">{comment.user.name}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-semibold">{getDisplayName(comment.user_name, comment.user_email)}</p>
+                  {getActivityTypeBadge(comment.activity_type, comment.card_title)}
+                </div>
                 <p className={cn(
                   "text-sm border-l-2 pl-3 my-1.5 italic",
-                  comment.isPrimary ? "text-foreground font-medium" : "text-muted-foreground"
+                  comment.is_main_comment ? "text-foreground font-medium" : "text-muted-foreground"
                 )}>
-                  "{comment.commentText}"
+                  "{comment.comment_text}"
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true, locale: ptBR })}
+                  {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ptBR })}
                 </p>
               </div>
-              {comment.user.id === MOCK_USER_ID && (
+              {!comment.is_main_comment && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 shrink-0">

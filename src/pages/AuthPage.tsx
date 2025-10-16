@@ -18,7 +18,7 @@ const AuthPage = () => {
   }, [session, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-2">
@@ -30,7 +30,34 @@ const AuthPage = () => {
         <CardContent>
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: 'hsl(var(--primary))',
+                    brandAccent: 'hsl(var(--primary))',
+                    brandButtonText: 'white',
+                    defaultButtonBackground: 'hsl(var(--secondary))',
+                    defaultButtonBackgroundHover: 'hsl(var(--secondary))',
+                    defaultButtonBorder: 'hsl(var(--border))',
+                    defaultButtonText: 'hsl(var(--foreground))',
+                    dividerBackground: 'hsl(var(--border))',
+                    inputBackground: 'hsl(var(--background))',
+                    inputBorder: 'hsl(var(--border))',
+                    inputBorderHover: 'hsl(var(--ring))',
+                    inputBorderFocus: 'hsl(var(--ring))',
+                    inputText: 'hsl(var(--foreground))',
+                    inputLabelText: 'hsl(var(--foreground))',
+                    inputPlaceholder: 'hsl(var(--muted-foreground))',
+                    messageText: 'hsl(var(--foreground))',
+                    messageTextDanger: 'hsl(var(--destructive))',
+                    anchorTextColor: 'hsl(var(--primary))',
+                    anchorTextHoverColor: 'hsl(var(--primary))',
+                  },
+                },
+              },
+            }}
             providers={[]}
             localization={{
               variables: {
@@ -40,6 +67,9 @@ const AuthPage = () => {
                   button_label: 'Entrar',
                   social_provider_text: 'Entrar com {{provider}}',
                   link_text: 'Já tem uma conta? Entre',
+                  loading_button_label: 'Entrando...',
+                  email_input_placeholder: 'seu@email.com',
+                  password_input_placeholder: 'Sua senha',
                 },
                 sign_up: {
                   email_label: 'Endereço de email',
@@ -47,15 +77,16 @@ const AuthPage = () => {
                   button_label: 'Cadastrar',
                   social_provider_text: 'Cadastrar com {{provider}}',
                   link_text: 'Não tem uma conta? Cadastre-se',
-                  user_details_label: 'Por favor, insira seus dados para se cadastrar',
                   email_input_placeholder: 'seu@email.com',
                   password_input_placeholder: 'Sua senha',
+                  loading_button_label: 'Cadastrando...',
                 },
                 forgotten_password: {
                   email_label: 'Endereço de email',
                   button_label: 'Enviar instruções',
                   link_text: 'Esqueceu sua senha?',
                   email_input_placeholder: 'seu@email.com',
+                  loading_button_label: 'Enviando instruções para seu email...',
                 },
               },
             }}

@@ -46,7 +46,7 @@ const ProfilePage = () => {
             title,
             subtitle,
             cover,
-            cards (id, title)
+            cards (id, title, image, cover)
           ),
           user_completed_cards (
             card_id

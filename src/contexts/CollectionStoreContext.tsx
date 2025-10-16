@@ -149,6 +149,108 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   const activeCollections = userCollections.filter(c => !c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived }));
   const archivedCollections = userCollections.filter(c => c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived }));
 
+  // Funções para gerenciar likes de atividades
+  const likeActivity = async (activityId: number) => {
+    if (!session) return false;
+    
+    const { error } = await supabase
+      .from('activity_likes')
+      .upsert({ activity_id: activityId, user_id: session.user.id }, {
+        onConflict: 'activity_id,user_id'
+      });
+    
+    if (error) {
+      console.error('Error liking activity:', error);
+      showError("Não foi possível curtir a atividade.");
+      return false;
+    }
+    return true;
+  };
+
+  const unlikeActivity = async (activityId: number) => {
+    if (!session) return false;
+    
+    const { error } = await supabase
+      .from('activity_likes')
+      .delete()
+      .eq('activity_id', activityId)
+      .eq('user_id', session.user.id);
+    
+    if (error) {
+      console.error('Error unliking activity:', error);
+      showError("Não foi possível descurtir a atividade.");
+      return false;
+    }
+    return true;
+  };
+
+  // Funções para gerenciar comentários de atividades
+  const addCommentToActivity = async (activityId: number, comment: string) => {
+    if (!session) return false;
+    
+    const { error } = await supabase
+      .from('activity_comments')
+      .insert({ activity_id: activityId, user_id: session.user.id, comment });
+    
+    if (error) {
+      console.error('Error adding comment:', error);
+      showError("Não foi possível adicionar o comentário.");
+      return false;
+    }
+    return true;
+  };
+
+  const removeCommentFromActivity = async (commentId: number) => {
+    if (!session) return false;
+    
+    const { error } = await supabase
+      .from('activity_comments')
+      .update({ removed_at: new Date().toISOString() })
+      .eq('id', commentId)
+      .eq('user_id', session.user.id);
+    
+    if (error) {
+      console.error('Error removing comment:', error);
+      showError("Não foi possível remover o comentário.");
+      return false;
+    }
+    return true;
+  };
+
+  // Função para buscar comentários de uma coleção
+  const getCommentsForCollection = async (userCollectionId: number) => {
+    if (!session) return [];
+    
+    const { data, error } = await supabase.rpc('get_collection_comments', {
+      p_user_collection_id: userCollectionId,
+      p_limit: 50,
+      p_offset: 0
+    });
+    
+    if (error) {
+      console.error('Error fetching collection comments:', error);
+      return [];
+    }
+    
+    return data || [];
+  };
+
+  // Função para buscar total de likes de uma coleção
+  const getLikesForCollection = async (userCollectionId: number) => {
+    if (!session) return 0;
+    
+    const { data, error } = await supabase.rpc('get_collection_likes', {
+      p_user_collection_id: userCollectionId
+    });
+    
+    if (error) {
+      console.error('Error fetching collection likes:', error);
+      return 0;
+    }
+    
+    return data || 0;
+  };
+
   const value = {
     loading,
     storeData: storeCollections,
@@ -167,8 +269,14 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     likedCollections: new Set(),
     getActivitiesForCollection: () => [],
     getAchievementsForCollection: () => [],
-    getCommentsForCollection: () => [],
+    getCommentsForCollection,
+    getLikesForCollection,
     toggleLikeCollection: () => showError("Funcionalidade em desenvolvimento."),
+    // Novas funções para atividades
+    likeActivity,
+    unlikeActivity,
+    addCommentToActivity,
+    removeCommentFromActivity,
   };
 
   return (

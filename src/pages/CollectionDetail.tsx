@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ScratchCard from "@/components/ScratchCard";
@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 const CollectionDetailPage = () => {
   const { id } = useParams();
   const instanceId = Number(id);
-  const { getCollectionById, getCompletedCardsForCollection, completeCard, getActivitiesForCollection, getAchievementsForCollection, getCommentsForCollection, likedCollections, toggleLikeCollection } = useCollectionStore();
+  const { getCollectionById, getCompletedCardsForCollection, completeCard, getActivitiesForCollection, getAchievementsForCollection, getCommentsForCollection, getLikesForCollection, likedCollections, toggleLikeCollection } = useCollectionStore();
   
   const collection = getCollectionById(instanceId);
   
@@ -39,14 +39,35 @@ const CollectionDetailPage = () => {
   const completedCards = getCompletedCardsForCollection(instanceId);
   const activities = getActivitiesForCollection(instanceId);
   const achievements = getAchievementsForCollection(instanceId);
-  const collectionComments = getCommentsForCollection(collection.id);
+  const [collectionComments, setCollectionComments] = useState<any[]>([]);
+  const [collectionLikes, setCollectionLikes] = useState(0);
+
+  // Load comments and likes when component mounts or collection changes
+  useEffect(() => {
+    const loadCollectionData = async () => {
+      if (collection) {
+        const comments = await getCommentsForCollection(instanceId);
+        const likes = await getLikesForCollection(instanceId);
+        setCollectionComments(comments);
+        setCollectionLikes(likes);
+      }
+    };
+    loadCollectionData();
+  }, [collection, instanceId, getCommentsForCollection, getLikesForCollection]);
 
   const handleCompleteCard = (cardId: number, cardTitle: string, completionData: { date: Date; comment: string; collectionComment: string }) => {
     completeCard(instanceId, cardId, cardTitle, completionData);
+    // Refresh comments and likes after completing a card
+    setTimeout(async () => {
+      const comments = await getCommentsForCollection(instanceId);
+      const likes = await getLikesForCollection(instanceId);
+      setCollectionComments(comments);
+      setCollectionLikes(likes);
+    }, 1000);
   };
 
   const isLiked = likedCollections.has(collection.id);
-  const likeCount = (collection.likes || 0) + (isLiked ? 1 : 0);
+  const likeCount = collectionLikes + (isLiked ? 1 : 0);
 
   return (
     <Layout>

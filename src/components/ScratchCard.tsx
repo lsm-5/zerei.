@@ -6,6 +6,7 @@ interface ScratchCardProps {
     id: number;
     title: string;
     image: string;
+    cover?: string;
   };
   number?: number;
   isCompleted?: boolean;
@@ -157,7 +158,7 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
       onMouseLeave={handleParallaxLeave}
     >
       <img 
-        src={card.image} 
+        src={isCompleted && card.cover ? card.cover : card.image} 
         alt={card.title} 
         className="w-full h-full object-cover transition-transform duration-200 ease-out"
         style={{ transform: transform }}
@@ -180,9 +181,9 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
           onTouchStart={(e) => handleInteractionStart(e.touches[0].clientX, e.touches[0].clientY)}
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center pointer-events-none">
-          <Lock className="h-10 w-10 mb-4 text-gray-600" />
-          <h3 className="font-semibold text-gray-700">{card.title}</h3>
-          <p className="text-sm text-gray-500 mt-2">Raspe para revelar</p>
+          <Lock className="h-10 w-10 mb-4 text-muted-foreground" />
+          <h3 className="font-semibold text-foreground">{card.title}</h3>
+          <p className="text-sm text-muted-foreground mt-2">Raspe para revelar</p>
         </div>
       </div>
 

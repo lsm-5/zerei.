@@ -1,20 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ScratchCard from './ScratchCard';
 import CompletionForm from './CompletionForm';
-import CardComments from './CardComments';
-import { ArrowLeft, Heart } from 'lucide-react';
-import { Button } from './ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useCollectionStore } from '@/contexts/CollectionStoreContext';
-import { showSuccess } from '@/utils/toast';
-import { cn } from '@/lib/utils';
 import { playAchievementSound } from '@/utils/sound';
 
 interface CardData {
   id: number;
   title: string;
   image: string;
+  cover?: string;
 }
 
 interface CollectionInfo {
@@ -44,21 +41,13 @@ interface ScratchCardModalProps {
 const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, collectionInfo, activities }: ScratchCardModalProps) => {
   const [isRevealed, setIsRevealed] = useState(isCardCompleted);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const { likeCard } = useCollectionStore();
 
   useEffect(() => {
     if (isOpen) {
       setIsRevealed(isCardCompleted);
       setShowConfetti(false);
-      setIsLiked(false);
     }
   }, [isOpen, card, isCardCompleted]);
-
-  const cardComments = useMemo(() => {
-    if (!card || !activities) return [];
-    return activities.filter(activity => activity.cardTitle === card.title && activity.comment);
-  }, [card, activities]);
 
   if (!card) return null;
 
@@ -72,13 +61,6 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
   const handleSave = (data: { date: Date; comment: string; collectionComment: string }) => {
     onComplete(card.id, card.title, data);
     onClose();
-  };
-
-  const handleLike = () => {
-    if (!card) return;
-    likeCard(collectionInfo.collectionId, card.id, card.title);
-    setIsLiked(true);
-    showSuccess(`Você curtiu "${card.title}"!`);
   };
 
   const isLastCard = !isCardCompleted && collectionInfo.completedCount + 1 === collectionInfo.totalCount;
@@ -108,13 +90,6 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
                     onSave={handleSave}
                     isLastCard={isLastCard}
                   />
-                  <div className="mt-4">
-                    <Button variant="outline" className="w-full" onClick={handleLike} disabled={isLiked}>
-                      <Heart className={cn("mr-2 h-4 w-4", isLiked && "fill-red-500 text-red-500")} />
-                      {isLiked ? "Curtido!" : "Curtir este card"}
-                    </Button>
-                  </div>
-                  <CardComments comments={cardComments} />
                 </div>
               ) : (
                 <div className="text-center text-muted-foreground flex flex-col items-center justify-center h-full p-8 border-2 border-dashed rounded-lg">
