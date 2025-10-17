@@ -31,17 +31,17 @@ const CardStack = ({ cards, onCardClick, completedCards }: CardStackProps) => {
   }
 
   return (
-    <div className="flex w-full items-center justify-center gap-6">
+    <div className="flex w-full items-center justify-center gap-2 sm:gap-4 md:gap-6">
       <Button 
         onClick={handlePrev} 
         variant="outline" 
         size="icon" 
-        className="shrink-0 h-12 w-12 hover:scale-110 transition-transform duration-200"
+        className="shrink-0 h-10 w-10 sm:h-12 sm:w-12 hover:scale-110 transition-transform duration-200"
       >
-        <ArrowLeft className="h-5 w-5" />
+        <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
       </Button>
       
-      <div className="relative h-[500px] w-full max-w-sm flex items-center justify-center">
+      <div className="relative h-[400px] sm:h-[450px] md:h-[500px] w-full max-w-xs sm:max-w-sm flex items-center justify-center">
         {cards.map((card, index) => {
           const position = (index - activeIndex + cards.length) % cards.length;
           
@@ -80,14 +80,14 @@ const CardStack = ({ cards, onCardClick, completedCards }: CardStackProps) => {
         })}
       </div>
       
-      <Button 
-        onClick={handleNext} 
-        variant="outline" 
-        size="icon" 
-        className="shrink-0 h-12 w-12 hover:scale-110 transition-transform duration-200"
-      >
-        <ArrowRight className="h-5 w-5" />
-      </Button>
+            <Button 
+              onClick={handleNext} 
+              variant="outline" 
+              size="icon" 
+              className="shrink-0 h-10 w-10 sm:h-12 sm:w-12 hover:scale-110 transition-transform duration-200"
+            >
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+            </Button>
     </div>
   );
 };

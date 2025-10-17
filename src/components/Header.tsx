@@ -9,9 +9,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Layers, Bell, Check, X, Gift } from "lucide-react";
+import { Layers, Bell, Check, X, Gift, Menu } from "lucide-react";
 import { useCollectionStore } from "@/contexts/CollectionStoreContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
@@ -36,6 +43,8 @@ const Header = () => {
           <Layers className="h-6 w-6 text-primary" />
           <span className="font-heading">Zerei.</span>
         </NavLink>
+        
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <NavLink to="/" className={({ isActive }) => `text-sm transition-colors hover:text-primary ${isActive ? 'font-bold text-primary' : 'font-medium text-muted-foreground'}`} end>
             Feed
@@ -50,6 +59,37 @@ const Header = () => {
             Amigos
           </NavLink>
         </nav>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-10 w-10">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col space-y-4 mt-6">
+                <NavLink to="/" className={({ isActive }) => `text-lg transition-colors hover:text-primary ${isActive ? 'font-bold text-primary' : 'font-medium text-muted-foreground'}`} end>
+                  Feed
+                </NavLink>
+                <NavLink to="/colecoes" className={({ isActive }) => `text-lg transition-colors hover:text-primary ${isActive ? 'font-bold text-primary' : 'font-medium text-muted-foreground'}`}>
+                  Coleções
+                </NavLink>
+                <NavLink to="/loja" className={({ isActive }) => `text-lg transition-colors hover:text-primary ${isActive ? 'font-bold text-primary' : 'font-medium text-muted-foreground'}`}>
+                  Loja
+                </NavLink>
+                <NavLink to="/amigos" className={({ isActive }) => `text-lg transition-colors hover:text-primary ${isActive ? 'font-bold text-primary' : 'font-medium text-muted-foreground'}`}>
+                  Amigos
+                </NavLink>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <div className="flex items-center gap-4">
           <NotificationBell />
 

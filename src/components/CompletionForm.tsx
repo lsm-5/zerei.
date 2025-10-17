@@ -25,34 +25,34 @@ const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCar
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 animate-fade-in">
-      <div className="text-center bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 p-2 md:p-3 rounded-md">
-        <p className="font-bold text-base md:text-lg">Parabéns!</p>
-        <p className="text-xs md:text-sm">Você raspou a carta {completedCount}/{totalCount} da coleção.</p>
+    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 animate-fade-in">
+      <div className="text-center bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 p-2 sm:p-3 rounded-md">
+        <p className="font-bold text-sm sm:text-base md:text-lg">Parabéns!</p>
+        <p className="text-xs sm:text-sm">Você raspou a carta {completedCount}/{totalCount} da coleção.</p>
       </div>
       <div className="space-y-1 pt-2">
-        <p className="text-xs md:text-sm font-medium text-muted-foreground">{subtitle}</p>
-        <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
+        <p className="text-xs sm:text-sm font-medium text-muted-foreground">{subtitle}</p>
+        <h3 className="text-base sm:text-lg md:text-xl font-semibold">{title}</h3>
       </div>
       <div>
-        <Label htmlFor="date">Data de Conclusão</Label>
+        <Label htmlFor="date" className="text-sm sm:text-base">Data de Conclusão</Label>
         <DatePicker date={date} setDate={setDate} />
       </div>
       <div>
-        <Label htmlFor="comment">Como foi sua experiência?</Label>
+        <Label htmlFor="comment" className="text-sm sm:text-base">Como foi sua experiência?</Label>
         <Textarea
           id="comment"
           placeholder="Como foi sua experiência?"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          rows={2}
-          className="text-sm"
+          rows={3}
+          className="text-sm min-h-[80px]"
         />
         <p className="text-xs text-muted-foreground text-center pt-1">
           Sua experiência será exibida como descrição do post no feed.
         </p>
       </div>
-      <Button type="submit" className="w-full text-sm md:text-base">
+      <Button type="submit" className="w-full text-sm sm:text-base h-11 sm:h-10">
         Salvar Progresso
       </Button>
     </form>

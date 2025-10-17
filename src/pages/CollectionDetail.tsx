@@ -91,26 +91,28 @@ const CollectionDetailPage = () => {
   return (
     <Layout>
       <div className="animate-fade-in">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <div>
-            <div className="flex items-center gap-4 mb-1">
-              <h1 className="text-3xl font-bold">{collection.title}</h1>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => toggleLikeCollection(collection.id)}
-                className="shrink-0"
-              >
-                <Heart className={cn("mr-2 h-4 w-4", isLiked && "fill-red-500 text-red-500")} />
-                {likeCount}
-              </Button>
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-1">
+                <h1 className="text-2xl sm:text-3xl font-bold">{collection.title}</h1>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleLikeCollection(collection.id)}
+                  className="shrink-0 h-8 sm:h-9"
+                >
+                  <Heart className={cn("mr-2 h-3 w-3 sm:h-4 sm:w-4", isLiked && "fill-red-500 text-red-500")} />
+                  {likeCount}
+                </Button>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">{collection.subtitle}</p>
             </div>
-            <p className="text-muted-foreground">{collection.subtitle}</p>
           </div>
-          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'grid' | 'list' | 'stack')}>
-            <ToggleGroupItem value="stack" aria-label="Stack view"><Layers className="h-4 w-4" /></ToggleGroupItem>
-            <ToggleGroupItem value="grid" aria-label="Grid view"><LayoutGrid className="h-4 w-4" /></ToggleGroupItem>
-            <ToggleGroupItem value="list" aria-label="List view"><List className="h-4 w-4" /></ToggleGroupItem>
+          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'grid' | 'list' | 'stack')} className="justify-center sm:justify-end">
+            <ToggleGroupItem value="stack" aria-label="Stack view" className="h-9 sm:h-10"><Layers className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="grid" aria-label="Grid view" className="h-9 sm:h-10"><LayoutGrid className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="list" aria-label="List view" className="h-9 sm:h-10"><List className="h-4 w-4" /></ToggleGroupItem>
           </ToggleGroup>
         </div>
 

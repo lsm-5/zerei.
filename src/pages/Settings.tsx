@@ -79,11 +79,11 @@ const SettingsPage = () => {
         <h1 className="text-3xl font-bold mb-6">Configurações</h1>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
             <TabsTrigger value="profile">Perfil</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="appearance">Aparência</TabsTrigger>
-            <TabsTrigger value="data">Dados</TabsTrigger>
+            {/* <TabsTrigger value="data">Dados</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="profile" className="mt-6">
@@ -199,7 +199,7 @@ const SettingsPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="data" className="mt-6">
+          {/* <TabsContent value="data" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Gerenciamento de Dados</CardTitle>
@@ -225,7 +225,7 @@ const SettingsPage = () => {
                 </AlertDialog>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </Layout>

@@ -69,7 +69,7 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
       <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-y-auto p-0 scrollbar-hide">
         {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
         <div className="grid grid-cols-1 md:grid-cols-2 min-h-[85vh] md:min-h-[80vh]">
-          <div className="flex items-center justify-center bg-muted/40 p-4">
+          <div className="flex items-center justify-center bg-muted/40 p-2 sm:p-4">
             <ScratchCard 
               card={card} 
               onReveal={handleReveal} 
@@ -77,7 +77,7 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
               isCompleted={isCardCompleted} 
             />
           </div>
-          <div className="p-3 md:p-6 flex flex-col">
+          <div className="p-3 sm:p-4 md:p-6 flex flex-col">
             <div className="flex-grow">
               {isRevealed ? (
                 <div>

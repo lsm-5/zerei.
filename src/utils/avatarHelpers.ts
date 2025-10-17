@@ -16,10 +16,15 @@ export const getInitials = (name: string | null | undefined): string => {
   const words = trimmedName.split(/\s+/).filter(word => word.length > 0);
   
   if (words.length === 1) {
-    // Uma palavra: primeira letra maiúscula
-    return words[0].charAt(0).toUpperCase();
+    // Uma palavra: primeira e segunda letra
+    const word = words[0];
+    if (word.length >= 2) {
+      return (word.charAt(0) + word.charAt(1)).toUpperCase();
+    } else {
+      return word.charAt(0).toUpperCase();
+    }
   } else {
-    // Duas ou mais palavras: primeira letra de cada uma das 2 primeiras palavras
+    // Duas ou mais palavras: primeira letra do nome e primeira letra do sobrenome
     return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
   }
 };

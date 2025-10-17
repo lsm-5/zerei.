@@ -242,14 +242,14 @@ const FriendsPage = () => {
   return (
     <Layout>
       <div className="animate-fade-in">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h1 className="text-3xl font-bold">Amigos</h1>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
+        <div className="flex flex-col gap-4 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold">Amigos</h1>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
+            <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Buscar amigos..." className="pl-10" />
+              <Input type="search" placeholder="Buscar amigos..." className="pl-10 h-10" />
             </div>
-            <Button onClick={() => setIsAddFriendModalOpen(true)}>
+            <Button onClick={() => setIsAddFriendModalOpen(true)} className="h-10">
               <UserPlus className="mr-2 h-4 w-4" /> Adicionar
             </Button>
           </div>
@@ -264,17 +264,17 @@ const FriendsPage = () => {
           
           <TabsContent value="friends" className="mt-6">
             {friends.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                 {friends.map(friend => (
                   <Card key={friend.id} className="text-center">
-                    <CardContent className="p-6 flex flex-col items-center gap-4">
+                    <CardContent className="p-3 sm:p-4 md:p-6 flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
                       <Link to={`/perfil/${friend.id}`}>
-                        <Avatar className="h-20 w-20 border-2 hover:border-primary transition-colors">
+                        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 border-2 hover:border-primary transition-colors">
                           <AvatarImage src={friend.avatar_url} alt={friend.name} />
-                          <AvatarFallback className="text-2xl">{friend.name?.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="text-sm sm:text-lg md:text-2xl">{friend.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
                       </Link>
-                      <Link to={`/perfil/${friend.id}`} className="font-semibold hover:underline truncate max-w-full block" title={friend.name || friend.email}>
+                      <Link to={`/perfil/${friend.id}`} className="font-semibold hover:underline truncate max-w-full block text-xs sm:text-sm" title={friend.name || friend.email}>
                         {friend.name || friend.email}
                       </Link>
                     </CardContent>
