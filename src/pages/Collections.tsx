@@ -97,7 +97,7 @@ const CollectionsPage = () => {
           user_collection_id,
           user_collections:user_collections!inner (
             id, is_public,
-            collections ( id, title, subtitle, cover, cards ( id ) )
+            collections ( id, title, subtitle, cover, cards ( id, title, cover ) )
           )
         `)
         .eq('user_id', session.user.id);
@@ -121,10 +121,31 @@ const CollectionsPage = () => {
       const { error } = await supabase.rpc('accept_collection_invite', { p_invite_id: inviteId });
       if (error) return showError('Erro ao aceitar convite.');
       showSuccess('Convite aceito!');
-      // Update invite status in local state
-      setInvites(prev => prev.map(i => i.id === inviteId ? { ...i, status: 'accepted' } : i));
-      // Refresh collections to show new instance
-      window.location.reload();
+      // Remove invite from list (it will be accepted and disappear)
+      setInvites(prev => prev.filter(i => i.id !== inviteId));
+      // Refresh member collections to show the new shared instance
+      const { data, error: memberError } = await supabase
+        .from('user_collection_members')
+        .select(`
+          user_collection_id,
+          user_collections:user_collections!inner (
+            id, is_public,
+            collections ( id, title, subtitle, cover, cards ( id, title, cover ) )
+          )
+        `)
+        .eq('user_id', session?.user.id);
+      if (!memberError && data) {
+        const mapped = data.map((row: any) => ({
+          instanceId: row.user_collections.id,
+          id: row.user_collections.collections.id,
+          title: row.user_collections.collections.title,
+          subtitle: row.user_collections.collections.subtitle,
+          cover: row.user_collections.collections.cover,
+          cards: row.user_collections.collections.cards || [],
+          isPublic: row.user_collections.is_public,
+        }));
+        setMemberCollections(mapped);
+      }
     } catch {
       showError('Erro ao aceitar convite.');
     }

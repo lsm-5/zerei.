@@ -47,33 +47,44 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     if (userCollectionsError) console.error('Error fetching user collections:', userCollectionsError);
     else setUserCollections(userCollectionsData || []);
 
-    if (userCollectionsData) {
-      const user_collection_ids = userCollectionsData.map(uc => uc.id);
-      if (user_collection_ids.length > 0) {
-        const { data: completedData, error: completedError } = await supabase
-          .from('user_completed_cards')
-          .select('user_collection_id, card_id')
-          .in('user_collection_id', user_collection_ids);
+    // Also fetch instances where user is a member (shared instances)
+    const { data: memberCollectionsData, error: memberCollectionsError } = await supabase
+      .from('user_collection_members')
+      .select('user_collection_id, user_collections!inner(*, collections(*, cards(*)))')
+      .eq('user_id', session.user.id);
+    
+    if (memberCollectionsError) console.error('Error fetching member collections:', memberCollectionsError);
 
-        if (completedError) console.error('Error fetching completed cards:', completedError);
-        else {
-          const completedMap = (completedData || []).reduce((acc, item) => {
-            if (!acc[item.user_collection_id]) {
-              acc[item.user_collection_id] = [];
-            }
-            acc[item.user_collection_id].push(item.card_id);
-            return acc;
-          }, {});
-          setCompletedCards(completedMap);
-        }
+    // Combine owned and member collections for completed cards and activities
+    const allCollectionIds = [
+      ...(userCollectionsData || []).map(uc => uc.id),
+      ...(memberCollectionsData || []).map(mc => mc.user_collection_id)
+    ];
+
+    if (allCollectionIds.length > 0) {
+      const { data: completedData, error: completedError } = await supabase
+        .from('user_completed_cards')
+        .select('user_collection_id, card_id')
+        .in('user_collection_id', allCollectionIds);
+
+      if (completedError) console.error('Error fetching completed cards:', completedError);
+      else {
+        const completedMap = (completedData || []).reduce((acc, item) => {
+          if (!acc[item.user_collection_id]) {
+            acc[item.user_collection_id] = [];
+          }
+          acc[item.user_collection_id].push(item.card_id);
+          return acc;
+        }, {});
+        setCompletedCards(completedMap);
       }
     }
 
-    // Fetch activities for all user collections
+    // Fetch activities for all user collections (owned and member)
     const { data: activitiesData, error: activitiesError } = await supabase
       .from('activities')
       .select('*')
-      .eq('user_id', session.user.id)
+      .in('user_collection_id', allCollectionIds)
       .order('created_at', { ascending: false });
 
     if (activitiesError) {
