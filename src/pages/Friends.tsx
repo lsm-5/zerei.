@@ -18,27 +18,31 @@ const FriendsPage = () => {
   const [requests, setRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchFriends = useCallback(async () => {
     if (!session) return;
 
-    // Buscar todas as amizades onde o usuário está envolvido
-    const { data: friendships, error: friendshipsError } = await supabase
-      .from('friendships')
-      .select('*')
-      .or(`user_one_id.eq.${session.user.id},user_two_id.eq.${session.user.id}`);
+    setLoading(true);
 
-    if (friendshipsError) {
-      console.error("Error fetching friendships:", friendshipsError);
-      return;
-    }
+    try {
+      // Buscar todas as amizades onde o usuário está envolvido
+      const { data: friendships, error: friendshipsError } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`user_one_id.eq.${session.user.id},user_two_id.eq.${session.user.id}`);
 
-    if (!friendships || friendships.length === 0) {
-      setFriends([]);
-      setRequests([]);
-      setSentRequests([]);
-      return;
-    }
+      if (friendshipsError) {
+        console.error("Error fetching friendships:", friendshipsError);
+        return;
+      }
+
+      if (!friendships || friendships.length === 0) {
+        setFriends([]);
+        setRequests([]);
+        setSentRequests([]);
+        return;
+      }
 
     // Coletar todos os IDs únicos de usuários
     const userIds = new Set();
@@ -93,9 +97,15 @@ const FriendsPage = () => {
       })
       .filter(Boolean);
 
-    setFriends(acceptedFriends);
-    setRequests(pendingRequests);
-    setSentRequests(sentRequests);
+      setFriends(acceptedFriends);
+      setRequests(pendingRequests);
+      setSentRequests(sentRequests);
+    } catch (error) {
+      console.error("Error in fetchFriends:", error);
+      showError("Erro ao carregar lista de amigos.");
+    } finally {
+      setLoading(false);
+    }
   }, [session]);
 
   useEffect(() => {
@@ -217,6 +227,17 @@ const FriendsPage = () => {
     }
   };
 
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando lista de amigos...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
