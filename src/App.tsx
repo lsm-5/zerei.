@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { CollectionStoreProvider } from "./contexts/CollectionStoreContext";
@@ -16,6 +16,7 @@ import StorePage from "./pages/Store";
 import FriendsPage from "./pages/Friends";
 import SettingsPage from "./pages/Settings";
 import ProfilePage from "./pages/Profile";
+import NotificationsPage from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,12 +36,14 @@ const App = () => (
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/" element={<FeedPage />} />
+                  <Route path="/feed" element={<Navigate to="/" replace />} />
                   <Route path="/colecoes" element={<CollectionsPage />} />
                   <Route path="/colecoes/:id" element={<CollectionDetailPage />} />
                   <Route path="/loja" element={<StorePage />} />
                   <Route path="/amigos" element={<FriendsPage />} />
                   <Route path="/config" element={<SettingsPage />} />
                   <Route path="/perfil/:id" element={<ProfilePage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
