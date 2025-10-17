@@ -16,12 +16,11 @@ interface CompletionFormProps {
 const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCard, onSave }: CompletionFormProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [comment, setComment] = useState('');
-  const [collectionComment, setCollectionComment] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (date) {
-      onSave({ date, comment, collectionComment });
+      onSave({ date, comment, collectionComment: '' });
     }
   };
 
@@ -53,22 +52,6 @@ const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCar
           Sua experiência será exibida como descrição do post no feed.
         </p>
       </div>
-      {isLastCard && (
-        <div className="animate-fade-in border-t pt-3 md:pt-4">
-          <Label htmlFor="collection-comment" className="text-sm md:text-base font-semibold">Avaliação da Coleção</Label>
-          <Textarea
-            id="collection-comment"
-            placeholder="Como foi sua experiência ao completar esta coleção?"
-            value={collectionComment}
-            onChange={(e) => setCollectionComment(e.target.value)}
-            rows={2}
-            className="mt-2 text-sm"
-          />
-          <p className="text-xs text-muted-foreground text-center pt-1">
-            Sua avaliação aparecerá no feed e na página da coleção.
-          </p>
-        </div>
-      )}
       <Button type="submit" className="w-full text-sm md:text-base">
         Salvar Progresso
       </Button>

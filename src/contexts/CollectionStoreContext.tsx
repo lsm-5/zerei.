@@ -12,6 +12,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   const [storeCollections, setStoreCollections] = useState<any[]>([]);
   const [userCollections, setUserCollections] = useState<any[]>([]);
   const [completedCards, setCompletedCards] = useState<any>({});
+  const [activities, setActivities] = useState<any[]>([]);
 
   const fetchData = useCallback(async () => {
     if (!session) {
@@ -68,6 +69,19 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       }
     }
 
+    // Fetch activities for all user collections
+    const { data: activitiesData, error: activitiesError } = await supabase
+      .from('activities')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
+
+    if (activitiesError) {
+      console.error('Error fetching activities:', activitiesError);
+    } else {
+      setActivities(activitiesData || []);
+    }
+
     setLoading(false);
   }, [session]);
 
@@ -105,7 +119,33 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     return new Set(completedCards[userCollectionId] || []);
   }, [completedCards]);
 
+  const getActivitiesForCollection = useCallback((userCollectionId: number) => {
+    return activities
+      .filter((activity: any) => activity.user_collection_id === userCollectionId)
+      .map((activity: any) => ({
+        id: activity.id,
+        type: activity.type,
+        timestamp: activity.created_at,
+        comment: activity.metadata?.comment
+      }));
+  }, [activities]);
+
+  const getAchievementsForCollection = useCallback((userCollectionId: number) => {
+    return activities
+      .filter((activity: any) => 
+        activity.user_collection_id === userCollectionId && 
+        (activity.type === 'achievement_unlocked' || activity.type === 'completed_collection')
+      )
+      .map((activity: any) => ({
+        percentage: activity.metadata?.percentage || 100,
+        timestamp: activity.created_at
+      }));
+  }, [activities]);
+
   const completeCard = async (userCollectionId: number, cardId: number, cardTitle: string, completionData: { date: Date; comment: string; collectionComment: string }) => {
+    if (!session) return;
+
+    // 1. Insert completed card
     const { error } = await supabase
       .from('user_completed_cards')
       .insert({ user_collection_id: userCollectionId, card_id: cardId, completed_at: completionData.date.toISOString(), comment: completionData.comment });
@@ -116,8 +156,84 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       return;
     }
 
+    // 2. Get collection info
+    const collection = userCollections.find(uc => uc.id === userCollectionId);
+    if (!collection) return;
+
+    const totalCards = collection.collections?.cards?.length || 0;
+    const currentCompletedCount = (completedCards[userCollectionId] || []).length;
+    const newCompletedCount = currentCompletedCount + 1;
+    const percentage = Math.floor((newCompletedCount / totalCards) * 100);
+
+    // 3. Check for achievement milestones (25%, 50%, 75%, 100%)
+    const previousPercentage = Math.floor((currentCompletedCount / totalCards) * 100);
+    const milestones = [25, 50, 75, 100];
+    
+    for (const milestone of milestones) {
+      if (percentage >= milestone && previousPercentage < milestone) {
+        // Check if achievement already exists
+        const { data: existingAchievement } = await supabase
+          .from('activities')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .eq('user_collection_id', userCollectionId)
+          .eq('type', milestone === 100 ? 'completed_collection' : 'achievement_unlocked')
+          .eq('metadata->>percentage', milestone.toString())
+          .maybeSingle();
+
+        if (!existingAchievement) {
+          // Create achievement activity
+          const activityType = milestone === 100 ? 'completed_collection' : 'achievement_unlocked';
+          const metadata: any = { percentage: milestone };
+          
+          if (milestone === 100 && completionData.collectionComment) {
+            metadata.comment = completionData.collectionComment;
+          }
+
+          const { error: achievementError } = await supabase.from('activities').insert({
+            user_id: session.user.id,
+            user_collection_id: userCollectionId,
+            collection_id: collection.collections.id,
+            type: activityType,
+            metadata: metadata
+          });
+
+          if (achievementError) {
+            console.error('Error creating achievement activity:', achievementError);
+            console.log('Achievement data:', { user_id: session.user.id, user_collection_id: userCollectionId, type: activityType, metadata });
+          }
+        }
+      }
+    }
+
+    // 4. Create completed_card activity
+    const { error: cardActivityError } = await supabase.from('activities').insert({
+      user_id: session.user.id,
+      user_collection_id: userCollectionId,
+      collection_id: collection.collections.id,
+      card_id: cardId,
+      type: 'completed_card',
+      metadata: { comment: completionData.comment }
+    });
+
+    if (cardActivityError) {
+      console.error('Error creating card activity:', cardActivityError);
+      console.log('Card activity data:', { user_id: session.user.id, user_collection_id: userCollectionId, card_id: cardId });
+    }
+
+    // 5. Update local state
     setCompletedCards(prev => ({ ...prev, [userCollectionId]: [...(prev[userCollectionId] || []), cardId] }));
     showSuccess(`Card "${cardTitle}" completado!`);
+    
+    // 6. Show special message for milestones
+    if (percentage === 100 && previousPercentage < 100) {
+      setTimeout(() => showSuccess("🎉 Parabéns! Você ZEROU a coleção!"), 500);
+    } else if ([25, 50, 75].includes(percentage) && !milestones.includes(previousPercentage)) {
+      setTimeout(() => showSuccess(`🏆 Conquista desbloqueada: ${percentage}%!`), 500);
+    }
+
+    // 7. Refresh data to get new activities
+    await fetchData();
   };
   
   const archiveCollection = async (userCollectionId: number) => {
@@ -272,8 +388,8 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     // Placeholders for temporarily disabled features
     globalFeed: [],
     likedCollections: new Set(),
-    getActivitiesForCollection: () => [],
-    getAchievementsForCollection: () => [],
+    getActivitiesForCollection,
+    getAchievementsForCollection,
     getCommentsForCollection,
     getLikesForCollection,
     toggleLikeCollection: () => showError("Funcionalidade em desenvolvimento."),

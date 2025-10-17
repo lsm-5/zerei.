@@ -35,6 +35,20 @@ const getColorForPercent = (percent: number) => {
 const AchievementBadges = ({ achievements, totalCount, tags }: AchievementBadgesProps) => {
   const allPossibleAchievements = [25, 50, 75, 100];
   const earnedPercentages = new Set(achievements.map(a => a.percentage));
+  
+  // Lógica de conquistas progressivas: se conquistou 50%, automaticamente conquistou 25%
+  const actualEarnedPercentages = new Set();
+  earnedPercentages.forEach(percentage => {
+    actualEarnedPercentages.add(percentage);
+    if (percentage >= 50) actualEarnedPercentages.add(25);
+    if (percentage >= 75) actualEarnedPercentages.add(50);
+    if (percentage >= 100) {
+      actualEarnedPercentages.add(25);
+      actualEarnedPercentages.add(50);
+      actualEarnedPercentages.add(75);
+    }
+  });
+  
   const BaseIcon = getIconForTags(tags);
 
   if (totalCount === 0) return null;
@@ -47,7 +61,7 @@ const AchievementBadges = ({ achievements, totalCount, tags }: AchievementBadges
       <CardContent>
         <div className="grid grid-cols-4 gap-4 text-center">
           {allPossibleAchievements.map(percent => {
-            const isEarned = earnedPercentages.has(percent);
+            const isEarned = actualEarnedPercentages.has(percent);
             const Icon = percent === 100 ? Trophy : BaseIcon;
             const colorClass = isEarned ? getColorForPercent(percent) : "text-muted-foreground opacity-50";
             
