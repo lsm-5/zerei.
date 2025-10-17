@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import FeedItem from '@/components/FeedItem';
 import FriendActivityFeed from '@/components/FriendActivityFeed';
 import TrendingCollections from '@/components/TrendingCollections';
+import TutorialModal from '@/components/TutorialModal';
 import { Layers, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { showError } from '@/utils/toast';
@@ -35,6 +36,7 @@ const FeedPage = () => {
   const [friendActivities, setFriendActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const fetchActivities = async () => {
     if (!session) return;
@@ -165,6 +167,13 @@ const FeedPage = () => {
     fetchActivities();
   }, [session]);
 
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('zerei_tutorial_completed') === 'true';
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
+
   if (loading) {
     return (
       <Layout>
@@ -207,6 +216,7 @@ const FeedPage = () => {
 
   return (
     <Layout>
+      <TutorialModal isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
       <div className="flex flex-col lg:flex-row gap-8 w-full">
         <div className="flex-1">
           <div className="space-y-6">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ const SettingsPage = () => {
   const { session } = useAuth();
   const user = session?.user;
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const { settings, setNotificationSetting } = useSettingsStore();
 
   const [name, setName] = useState('');
@@ -63,6 +65,12 @@ const SettingsPage = () => {
     }
     
     setIsSaving(false);
+  };
+
+  const reopenTutorial = () => {
+    localStorage.removeItem('zerei_tutorial_completed');
+    showSuccess('Tutorial será reaberto na próxima vez que você acessar o Feed!');
+    navigate('/feed');
   };
 
 
@@ -168,6 +176,18 @@ const SettingsPage = () => {
                     <RadioGroupItem value="system" />
                   </Label>
                 </RadioGroup>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Tutorial</CardTitle>
+                <CardDescription>Reabra o tutorial de introdução.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={reopenTutorial} variant="outline">
+                  Reabrir Tutorial
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
