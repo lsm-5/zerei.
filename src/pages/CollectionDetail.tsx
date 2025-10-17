@@ -108,8 +108,8 @@ const CollectionDetailPage = () => {
             <p className="text-muted-foreground">{collection.subtitle}</p>
           </div>
           <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'grid' | 'list' | 'stack')}>
-            <ToggleGroupItem value="grid" aria-label="Grid view"><LayoutGrid className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="stack" aria-label="Stack view"><Layers className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="grid" aria-label="Grid view"><LayoutGrid className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="list" aria-label="List view"><List className="h-4 w-4" /></ToggleGroupItem>
           </ToggleGroup>
         </div>
