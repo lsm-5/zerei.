@@ -34,8 +34,15 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
     // Set canvas size with proper scaling
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
+    
+    // Use auto for width and height when not scratchable (stack view)
+    if (!scratchable) {
+      canvas.style.width = 'auto';
+      canvas.style.height = 'auto';
+    } else {
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+    }
 
     const context = canvas.getContext('2d');
     if (!context) return;
@@ -46,7 +53,10 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
   };
 
   useEffect(() => {
-    setupCanvas();
+    // Add a small delay to ensure the component is fully mounted
+    const timer = setTimeout(() => {
+      setupCanvas();
+    }, 50);
     
     // Handle resize and orientation change
     const handleResize = () => {
@@ -57,10 +67,11 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
     window.addEventListener('orientationchange', handleResize);
     
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
     };
-  }, [showScratchLayer]);
+  }, [showScratchLayer, scratchable]);
 
   const getBrushPos = (x: number, y: number) => {
     const canvas = canvasRef.current;

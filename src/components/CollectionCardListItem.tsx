@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2, Circle, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -21,15 +21,22 @@ interface CollectionCardListItemProps {
 const CollectionCardListItem = ({ card, number, isCompleted, onClick, completionDate }: CollectionCardListItemProps) => {
   return (
     <Card 
-      className="p-4 hover:bg-accent/50 transition-colors cursor-pointer"
+      className="p-4 hover:bg-accent/50 transition-colors cursor-pointer relative"
       onClick={onClick}
     >
       <div className="flex items-center gap-4">
-        <img 
-          src={card.cover} 
-          alt={card.title} 
-          className="w-16 h-24 object-cover rounded-md shadow-sm"
-        />
+        <div className="relative">
+          <img 
+            src={card.cover} 
+            alt={card.title} 
+            className="w-16 h-24 object-cover rounded-md shadow-sm"
+          />
+          {!isCompleted && (
+            <div className="absolute inset-0 bg-gray-300 rounded-lg flex items-center justify-center">
+              <Lock className="h-4 w-4 text-gray-600" />
+            </div>
+          )}
+        </div>
         <div className="flex-1">
           <p className="text-sm text-muted-foreground">Card #{number}</p>
           <h4 className="font-semibold text-lg">{card.title}</h4>

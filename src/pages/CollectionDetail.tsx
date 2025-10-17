@@ -5,7 +5,7 @@ import ScratchCard from "@/components/ScratchCard";
 import ScratchCardModal from "@/components/ScratchCardModal";
 import CardStack from "@/components/CardStack";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { LayoutGrid, Layers, List, Heart } from "lucide-react";
+import { LayoutGrid, List, Heart, Layers } from "lucide-react";
 import { useCollectionStore } from "@/contexts/CollectionStoreContext";
 import ActivityFeed from "@/components/ActivityFeed";
 import AchievementBadges from "@/components/AchievementBadges";
@@ -18,29 +18,25 @@ import { cn } from "@/lib/utils";
 const CollectionDetailPage = () => {
   const { id } = useParams();
   const instanceId = Number(id);
-  const { getCollectionById, getCompletedCardsForCollection, completeCard, getActivitiesForCollection, getAchievementsForCollection, getCommentsForCollection, getLikesForCollection, likedCollections, toggleLikeCollection } = useCollectionStore();
+  const { getCollectionById, getCompletedCardsForCollection, completeCard, getActivitiesForCollection, getAchievementsForCollection, getCommentsForCollection, getLikesForCollection, likedCollections, toggleLikeCollection, loading } = useCollectionStore();
   
-  const collection = getCollectionById(instanceId);
-  
-  const [viewMode, setViewMode] = useState<'grid' | 'stack' | 'list'>('stack');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'stack'>('stack');
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [collectionComments, setCollectionComments] = useState<any[]>([]);
+  const [collectionLikes, setCollectionLikes] = useState(0);
 
-  if (!collection) {
-    return (
-      <Layout>
-        <div className="text-center py-16">
-          <h1 className="text-2xl font-bold">Coleção não encontrada</h1>
-          <p className="text-muted-foreground mt-2">A coleção que você está procurando não existe ou foi movida.</p>
-        </div>
-      </Layout>
-    );
-  }
-
+  const collection = getCollectionById(instanceId);
   const completedCards = getCompletedCardsForCollection(instanceId);
   const activities = getActivitiesForCollection(instanceId);
   const achievements = getAchievementsForCollection(instanceId);
-  const [collectionComments, setCollectionComments] = useState<any[]>([]);
-  const [collectionLikes, setCollectionLikes] = useState(0);
+
+  // Wait for data to be loaded before showing content
+  useEffect(() => {
+    if (!loading && !isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [loading, isInitialized]);
 
   // Load comments and likes when component mounts or collection changes
   useEffect(() => {
@@ -54,6 +50,29 @@ const CollectionDetailPage = () => {
     };
     loadCollectionData();
   }, [collection, instanceId, getCommentsForCollection, getLikesForCollection]);
+
+  // Show loading state while data is being fetched
+  if (loading || !isInitialized) {
+    return (
+      <Layout>
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando coleção...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!collection) {
+    return (
+      <Layout>
+        <div className="text-center py-16">
+          <h1 className="text-2xl font-bold">Coleção não encontrada</h1>
+          <p className="text-muted-foreground mt-2">A coleção que você está procurando não existe ou foi movida.</p>
+        </div>
+      </Layout>
+    );
+  }
 
   const handleCompleteCard = (cardId: number, cardTitle: string, completionData: { date: Date; comment: string; collectionComment: string }) => {
     completeCard(instanceId, cardId, cardTitle, completionData);
@@ -88,7 +107,7 @@ const CollectionDetailPage = () => {
             </div>
             <p className="text-muted-foreground">{collection.subtitle}</p>
           </div>
-          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'grid' | 'stack' | 'list')}>
+          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as 'grid' | 'list' | 'stack')}>
             <ToggleGroupItem value="grid" aria-label="Grid view"><LayoutGrid className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="stack" aria-label="Stack view"><Layers className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="list" aria-label="List view"><List className="h-4 w-4" /></ToggleGroupItem>
