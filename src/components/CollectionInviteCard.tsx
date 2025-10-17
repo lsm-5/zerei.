@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/avatarHelpers";
 import { Check, X } from "lucide-react";
 
 interface Collection {
@@ -34,8 +35,7 @@ const CollectionInviteCard = ({ invitation, onAccept, onDecline, onPreview }: Co
       <CardHeader className="p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={inviter.avatar} alt={inviter.name} />
-            <AvatarFallback>{inviter.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getInitials(inviter.name)}</AvatarFallback>
           </Avatar>
           <p className="text-sm">
             <span className="font-semibold">{inviter.name}</span> convidou você para participar.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -30,7 +30,6 @@ const CardComments = ({ comments }: CardCommentsProps) => {
         {comments.map((comment) => (
           <div key={comment.id} className="flex items-start space-x-3">
             <Avatar className="h-9 w-9">
-              <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${comment.id}`} />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div className="flex-1 bg-muted/50 p-3 rounded-lg">

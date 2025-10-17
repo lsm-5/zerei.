@@ -15,7 +15,8 @@ import CollectionComments from "@/components/CollectionComments";
 import InviteFriendToCollectionModal from "@/components/InviteFriendToCollectionModal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/avatarHelpers";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -128,8 +129,7 @@ const CollectionDetailPage = () => {
                     <div className="flex -space-x-2">
                       {participants.map((p) => (
                         <Avatar key={p.id} className="h-7 w-7 ring-2 ring-background">
-                          <AvatarImage src={p.avatar_url} />
-                          <AvatarFallback>{(p.name || '?').slice(0,1)}</AvatarFallback>
+                          <AvatarFallback>{getInitials(p.name)}</AvatarFallback>
                         </Avatar>
                       ))}
                     </div>

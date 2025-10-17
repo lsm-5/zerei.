@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layers, Bell, Check, X, Gift, Menu } from "lucide-react";
 import { useCollectionStore } from "@/contexts/CollectionStoreContext";
@@ -32,9 +32,6 @@ const Header = () => {
   const { settings } = useSettingsStore();
 
 
-  const avatarSrc = settings.profile.useInitialAvatar 
-    ? '' 
-    : `https://api.dicebear.com/8.x/lorelei/svg?seed=${settings.profile.avatarSeed || user?.email}`;
 
   return (
     <header className="bg-background border-b">
@@ -96,7 +93,6 @@ const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer h-9 w-9">
-                <AvatarImage src={avatarSrc} alt={user?.user_metadata.name} />
                 <AvatarFallback>{getInitials(user?.user_metadata.name)}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>

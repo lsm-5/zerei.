@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/avatarHelpers";
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -51,8 +52,7 @@ const FriendActivityFeed = ({ activities }: FriendActivityFeedProps) => {
               <li key={activity.id} className="flex items-start gap-3">
                 <Link to={`/perfil/${activity.user.id}`}>
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={activity.user.avatar} alt={activity.user.name} />
-                    <AvatarFallback>{activity.user.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{getInitials(activity.user.name)}</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div>

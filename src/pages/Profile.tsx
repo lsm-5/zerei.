@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { getInitials } from '@/utils/avatarHelpers';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, Lock } from 'lucide-react';
 import FriendCollectionPreviewModal from '@/components/FriendCollectionPreviewModal';
@@ -191,8 +192,7 @@ const ProfilePage = () => {
 
         <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
           <Avatar className="h-24 w-24 border-4 border-primary/20">
-            <AvatarImage src={profile.avatar_url} alt={profile.name} />
-            <AvatarFallback className="text-3xl">{profile.name?.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="text-3xl">{getInitials(profile.name)}</AvatarFallback>
           </Avatar>
           <div>
             <h1 className="text-4xl font-bold">{profile.name}</h1>

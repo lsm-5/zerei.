@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { showSuccess, showError } from '@/utils/toast';
@@ -147,7 +147,6 @@ const InviteFriendToCollectionModal = ({
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={friend.avatar_url} />
                       <AvatarFallback className="text-sm">
                         {getInitials(friend.name)}
                       </AvatarFallback>

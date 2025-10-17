@@ -9,7 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/avatarHelpers";
 import { showError, showSuccess } from "@/utils/toast";
 
 const CollectionsPage = () => {
@@ -207,8 +208,7 @@ const CollectionsPage = () => {
                   <div className="mt-2 flex -space-x-2">
                     {participantsByInstance[collection.instanceId].slice(0,3).map((p) => (
                       <Avatar key={p.id} className="h-6 w-6 ring-2 ring-black/40">
-                        <AvatarImage src={p.avatar_url} />
-                        <AvatarFallback>{(p.name || '?').slice(0,1)}</AvatarFallback>
+                        <AvatarFallback>{getInitials(p.name)}</AvatarFallback>
                       </Avatar>
                     ))}
                   </div>
@@ -252,8 +252,7 @@ const CollectionsPage = () => {
                     <div key={inv.id} className="flex items-center justify-between p-3 rounded-md bg-muted/40">
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={inv.invited_by_profile?.avatar_url} />
-                          <AvatarFallback>{(inv.invited_by_profile?.name || '?').slice(0,1)}</AvatarFallback>
+                          <AvatarFallback>{getInitials(inv.invited_by_profile?.name)}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">{inv.invited_by_profile?.name || 'Alguém'}</p>

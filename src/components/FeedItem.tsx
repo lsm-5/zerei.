@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart, MessageCircle, Crown, Trophy, Trash2, Lock } from "lucide-react";
@@ -109,7 +109,7 @@ const FeedItem = ({ item }: FeedItemProps) => {
             user: {
               id: comment.user_id,
               name: comment.profiles?.name || 'Usuário',
-              avatar: comment.profiles?.avatar_url || `https://api.dicebear.com/8.x/lorelei/svg?seed=${comment.user_id}`
+              avatar: ''
             },
             text: comment.comment,
             createdAt: comment.created_at
@@ -222,7 +222,6 @@ const FeedItem = ({ item }: FeedItemProps) => {
       <CardHeader className="flex flex-row items-center gap-4">
         <Link to={`/perfil/${user.id}`} className="flex items-center gap-4 group flex-1">
           <Avatar>
-            <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div>
@@ -300,7 +299,6 @@ const FeedItem = ({ item }: FeedItemProps) => {
               <div key={comment.id || index} className="flex items-start gap-3 group">
                 <Link to={`/perfil/${comment.user.id}`}>
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
                     <AvatarFallback>{getInitials(comment.user.name)}</AvatarFallback>
                   </Avatar>
                 </Link>

@@ -141,7 +141,7 @@ const FeedPage = () => {
         user: {
           id: activity.profiles.id,
           name: activity.profiles.name,
-          avatar: activity.profiles.avatar_url || `https://api.dicebear.com/8.x/lorelei/svg?seed=${activity.profiles.id}`
+          avatar: ''
         },
         type: activity.type,
         data: {

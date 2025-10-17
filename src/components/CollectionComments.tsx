@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MessageSquare, Trash2 } from 'lucide-react';
@@ -87,7 +87,6 @@ const CollectionComments = ({ comments }: CollectionCommentsProps) => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <Avatar>
-                <AvatarImage src={comment.user_avatar} />
                 <AvatarFallback>{getInitials(comment.user_name)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">

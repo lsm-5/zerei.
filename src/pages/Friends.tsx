@@ -4,7 +4,8 @@ import Layout from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { getInitials } from '@/utils/avatarHelpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, UserPlus, UserCheck, UserX } from 'lucide-react';
 import AddFriendModal from '@/components/AddFriendModal';
@@ -270,8 +271,7 @@ const FriendsPage = () => {
                     <CardContent className="p-3 sm:p-4 md:p-6 flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
                       <Link to={`/perfil/${friend.id}`}>
                         <Avatar className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 border-2 hover:border-primary transition-colors">
-                          <AvatarImage src={friend.avatar_url} alt={friend.name} />
-                          <AvatarFallback className="text-sm sm:text-lg md:text-2xl">{friend.name?.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="text-sm sm:text-lg md:text-2xl">{getInitials(friend.name)}</AvatarFallback>
                         </Avatar>
                       </Link>
                       <Link to={`/perfil/${friend.id}`} className="font-semibold hover:underline truncate max-w-full block text-xs sm:text-sm" title={friend.name || friend.email}>
@@ -295,8 +295,7 @@ const FriendsPage = () => {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={request.avatar_url} alt={request.name} />
-                        <AvatarFallback>{request.name?.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getInitials(request.name)}</AvatarFallback>
                       </Avatar>
                       <p className="font-semibold truncate max-w-full" title={request.name || request.email}>
                         {request.name || request.email}
@@ -320,8 +319,7 @@ const FriendsPage = () => {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={request.avatar_url} alt={request.name} />
-                        <AvatarFallback>{request.name?.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{getInitials(request.name)}</AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="font-semibold truncate max-w-full" title={request.name || request.email}>

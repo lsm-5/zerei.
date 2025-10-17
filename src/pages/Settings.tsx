@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/avatarHelpers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -19,7 +20,7 @@ const SettingsPage = () => {
   const { session } = useAuth();
   const user = session?.user;
   const { theme, setTheme } = useTheme();
-  const { settings, setNotificationSetting, setAvatarSeed, setUseInitialAvatar } = useSettingsStore();
+  const { settings, setNotificationSetting } = useSettingsStore();
 
   const [name, setName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -64,14 +65,6 @@ const SettingsPage = () => {
     setIsSaving(false);
   };
 
-  const handlePhotoChange = () => {
-    const randomSeed = Math.random().toString(36).substring(7);
-    setAvatarSeed(randomSeed);
-  };
-
-  const avatarSrc = settings.profile.useInitialAvatar 
-    ? '' 
-    : `https://api.dicebear.com/8.x/lorelei/svg?seed=${settings.profile.avatarSeed || user?.email}`;
 
   return (
     <Layout>
@@ -95,28 +88,8 @@ const SettingsPage = () => {
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={avatarSrc} />
-                    <AvatarFallback>{name?.charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>{getInitials(name)}</AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col gap-2">
-                    <RadioGroup 
-                      value={settings.profile.useInitialAvatar ? 'initial' : 'generated'} 
-                      onValueChange={(value) => setUseInitialAvatar(value === 'initial')}
-                      className="flex gap-4"
-                    >
-                      <Label className="flex items-center gap-2 cursor-pointer">
-                        <RadioGroupItem value="generated" id="r1" />
-                        Avatar Gerado
-                      </Label>
-                      <Label className="flex items-center gap-2 cursor-pointer">
-                        <RadioGroupItem value="initial" id="r2" />
-                        Usar Iniciais
-                      </Label>
-                    </RadioGroup>
-                    <Button variant="outline" onClick={handlePhotoChange} disabled={settings.profile.useInitialAvatar}>
-                      Mudar foto
-                    </Button>
-                  </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
