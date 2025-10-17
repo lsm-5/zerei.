@@ -110,12 +110,17 @@ const ProfilePage = () => {
         const formattedCollections = await Promise.all(
           collectionsData.map(async (uc: any) => {
             const { data: completedCards, error: completedError } = await supabase
-              .from('user_completed_cards')
-              .select('card_id')
-              .eq('user_collection_id', uc.id);
+              .rpc('get_friend_completed_cards', {
+                p_user_collection_id: uc.id,
+                p_viewer_id: session.user.id,
+                p_owner_id: id
+              });
 
             if (completedError) {
               console.error('Error fetching completed cards:', completedError);
+              console.log('RPC params:', { user_collection_id: uc.id, viewer_id: session.user.id, owner_id: id });
+            } else {
+              console.log('Completed cards for collection:', uc.id, completedCards?.length || 0);
             }
 
             return {
