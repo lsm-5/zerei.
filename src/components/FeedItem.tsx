@@ -43,6 +43,7 @@ interface FeedItemProps {
     data: {
       collectionId: number;
       cardTitle?: string;
+      cardCover?: string;
       collectionTitle: string;
       coverImage: string;
       achievementPercentage?: number;
@@ -103,12 +104,12 @@ const FeedItem = ({ item }: FeedItemProps) => {
           .order('created_at', { ascending: true });
 
         if (!commentsError && commentsData) {
-          const formattedComments = commentsData.map(comment => ({
+          const formattedComments = commentsData.map((comment: any) => ({
             id: comment.id,
             user: {
               id: comment.user_id,
-              name: comment.profiles.name,
-              avatar: comment.profiles.avatar_url || `https://api.dicebear.com/8.x/lorelei/svg?seed=${comment.user_id}`
+              name: comment.profiles?.name || 'Usuário',
+              avatar: comment.profiles?.avatar_url || `https://api.dicebear.com/8.x/lorelei/svg?seed=${comment.user_id}`
             },
             text: comment.comment,
             createdAt: comment.created_at
@@ -202,9 +203,15 @@ const FeedItem = ({ item }: FeedItemProps) => {
     return null;
   };
 
-  const CoverImage = () => (
-    <img src={data.coverImage} alt={data.collectionTitle} className="w-full h-full object-cover group-hover:opacity-80 transition-opacity" />
-  );
+  const CoverImage = () => {
+    // Para posts de conclusão de card, mostrar a imagem do card se disponível
+    const imageSrc = (type === 'completed_card' && data.cardCover) ? data.cardCover : data.coverImage;
+    const imageAlt = (type === 'completed_card' && data.cardTitle) ? data.cardTitle : data.collectionTitle;
+    
+    return (
+      <img src={imageSrc} alt={imageAlt} className="w-full h-full object-cover group-hover:opacity-80 transition-opacity" />
+    );
+  };
 
   return (
     <Card className={cn(
@@ -219,7 +226,7 @@ const FeedItem = ({ item }: FeedItemProps) => {
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold group-hover:text-primary transition-colors">{getDisplayName(user.name, user.email)}</p>
+            <p className="font-semibold group-hover:text-primary transition-colors">{getDisplayName(user.name, user.name)}</p>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ptBR })}
             </p>
@@ -317,7 +324,7 @@ const FeedItem = ({ item }: FeedItemProps) => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => removeCommentFromFeedItem(item.id, comment.id)}>
+                        <AlertDialogAction onClick={() => removeCommentFromActivity(item.id, comment.id)}>
                           Excluir
                         </AlertDialogAction>
                       </AlertDialogFooter>

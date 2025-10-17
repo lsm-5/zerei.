@@ -20,6 +20,7 @@ interface Activity {
   collection_cover: string;
   card_id?: number;
   card_title?: string;
+  card_cover?: string;
   metadata: any;
   created_at: string;
   like_count: number;
@@ -49,7 +50,32 @@ const FeedPage = () => {
         return;
       }
 
-      setActivities(data || []);
+      // Para atividades de conclusão de card, buscar a imagem do card
+      const activitiesWithCardImages = await Promise.all(
+        (data || []).map(async (activity: any) => {
+          if (activity.type === 'completed_card' && activity.card_id) {
+            try {
+              const { data: cardData, error: cardError } = await supabase
+                .from('cards')
+                .select('cover')
+                .eq('id', activity.card_id)
+                .single();
+
+              if (!cardError && cardData) {
+                return {
+                  ...activity,
+                  card_cover: cardData.cover
+                };
+              }
+            } catch (error) {
+              console.error('Error fetching card cover:', error);
+            }
+          }
+          return activity;
+        })
+      );
+
+      setActivities(activitiesWithCardImages);
     } catch (error) {
       console.error('Error:', error);
       showError("Erro ao carregar atividades.");
@@ -135,15 +161,15 @@ const FeedPage = () => {
               item={{
                 id: activity.activity_id,
                 user: {
-                  id: activity.user_id,
+                  id: parseInt(activity.user_id),
                   name: getDisplayName(activity.user_name, activity.user_email),
-                  email: activity.user_email,
                   avatar: activity.user_avatar || `https://api.dicebear.com/8.x/lorelei/svg?seed=${activity.user_id}`
                 },
                 type: activity.type,
                 data: {
                   collectionId: activity.collection_id,
                   cardTitle: activity.card_title,
+                  cardCover: activity.card_cover,
                   collectionTitle: activity.collection_title,
                   coverImage: activity.collection_cover,
                   achievementPercentage: activity.metadata?.percentage,
@@ -151,6 +177,7 @@ const FeedPage = () => {
                   commentRemovedAt: activity.metadata?.commentRemovedAt,
                 },
                 timestamp: activity.created_at,
+                likes: activity.like_count || 0,
                 comments: [], // Será implementado posteriormente
               }}
             />

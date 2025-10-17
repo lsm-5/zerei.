@@ -35,14 +35,9 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     
-    // Use auto for width and height when not scratchable (stack view)
-    if (!scratchable) {
-      canvas.style.width = 'auto';
-      canvas.style.height = 'auto';
-    } else {
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-    }
+    // Use 100% for width and height to cover the entire card
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 
     const context = canvas.getContext('2d');
     if (!context) return;
