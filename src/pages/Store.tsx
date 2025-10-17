@@ -35,12 +35,12 @@ const StorePage = () => {
     });
   }, [searchTerm, selectedTag, storeData]);
 
-  const handleAcquireCollection = (collection: any, isPublic: boolean) => {
-    const success = addCollection(collection, isPublic);
+  const handleAcquireCollection = async (collection: any, isPublic: boolean) => {
+    const success = await addCollection(collection, isPublic);
     if (success) {
       showSuccess(`Coleção "${collection.title}" adicionada!`);
     } else {
-      showError("Você já possui esta coleção.");
+      showError("Não foi possível adicionar a coleção.");
     }
     setSelectedCollection(null);
   };

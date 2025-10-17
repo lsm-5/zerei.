@@ -10,7 +10,6 @@ import { playAchievementSound } from '@/utils/sound';
 interface CardData {
   id: number;
   title: string;
-  image: string;
   cover?: string;
 }
 
@@ -67,9 +66,9 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl p-0">
+      <DialogContent className="w-[95vw] max-w-5xl max-h-[95vh] overflow-hidden p-0">
         {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
-        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen md:min-h-[70vh]">
+        <div className="grid grid-cols-1 md:grid-cols-2 h-[85vh] md:h-[80vh]">
           <div className="flex items-center justify-center bg-muted/40">
             <ScratchCard 
               card={card} 
@@ -78,8 +77,8 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
               isCompleted={isCardCompleted} 
             />
           </div>
-          <div className="p-8 flex flex-col">
-            <div className="flex-grow overflow-y-auto pr-4">
+          <div className="p-3 md:p-6 flex flex-col h-full">
+            <div className="flex-grow overflow-y-auto pr-1 md:pr-3">
               {isRevealed ? (
                 <div>
                   <CompletionForm 
@@ -92,10 +91,10 @@ const ScratchCardModal = ({ card, isOpen, isCardCompleted, onClose, onComplete, 
                   />
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground flex flex-col items-center justify-center h-full p-8 border-2 border-dashed rounded-lg">
-                  <p className="font-semibold">Raspe o card ao lado para revelar a imagem.</p>
-                  <ArrowLeft className="w-8 h-8 mt-4 animate-pulse" />
-                  <p className="mt-4">Depois, você poderá adicionar seus comentários.</p>
+                <div className="text-center text-muted-foreground flex flex-col items-center justify-center h-full p-4 md:p-8 border-2 border-dashed rounded-lg">
+                  <p className="font-semibold text-sm md:text-base">Raspe o card ao lado para revelar a imagem.</p>
+                  <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 mt-4 animate-pulse" />
+                  <p className="mt-4 text-xs md:text-sm">Depois, você poderá adicionar seus comentários.</p>
                 </div>
               )}
             </div>

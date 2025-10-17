@@ -26,14 +26,14 @@ const InviteToCollectionModal = ({ isOpen, onClose, friendName }: InviteToCollec
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Convidar {friendName}</DialogTitle>
           <DialogDescription>Selecione uma de suas coleções para convidar {friendName} para participar.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <h4 className="font-semibold mb-2">Suas Coleções Ativas:</h4>
-          <ScrollArea className="h-64 rounded-md border">
+          <ScrollArea className="h-48 md:h-64 rounded-md border">
             <div className="p-4 space-y-2">
               {activeCollections.map((collection: any) => (
                 <div

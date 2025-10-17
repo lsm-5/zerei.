@@ -20,11 +20,23 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     }
     setLoading(true);
 
+    // Buscar coleções com contagem de aquisições
     const { data: storeData, error: storeError } = await supabase
       .from('collections')
-      .select('*, cards(*)');
+      .select(`
+        *,
+        cards(*),
+        user_collections(count)
+      `);
     if (storeError) console.error('Error fetching store collections:', storeError);
-    else setStoreCollections(storeData || []);
+    else {
+      // Adicionar contagem de aquisições
+      const collectionsWithAcquisitions = (storeData || []).map(collection => ({
+        ...collection,
+        acquisitions: collection.user_collections?.[0]?.count || 0
+      }));
+      setStoreCollections(collectionsWithAcquisitions);
+    }
 
     const { data: userCollectionsData, error: userCollectionsError } = await supabase
       .from('user_collections')
@@ -66,12 +78,6 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   const addCollection = async (collection: any, isPublic: boolean = true) => {
     if (!session) return false;
 
-    const alreadyExists = userCollections.some(uc => uc.collection_id === collection.id);
-    if (alreadyExists) {
-      showError("Você já possui esta coleção.");
-      return false;
-    }
-
     const { data, error } = await supabase
       .from('user_collections')
       .insert({ user_id: session.user.id, collection_id: collection.id, is_public: isPublic })
@@ -86,19 +92,18 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
 
     if (data) {
       setUserCollections(prev => [...prev, data]);
-      showSuccess(`Coleção "${collection.title}" adicionada!`);
     }
     return true;
   };
 
-  const getCollectionById = (userCollectionId: number) => {
+  const getCollectionById = useCallback((userCollectionId: number) => {
     const uc = userCollections.find(c => c.id === userCollectionId);
     return uc ? { ...uc.collections, instanceId: uc.id, isPublic: uc.is_public, isArchived: uc.is_archived } : null;
-  };
+  }, [userCollections]);
 
-  const getCompletedCardsForCollection = (userCollectionId: number): Set<number> => {
+  const getCompletedCardsForCollection = useCallback((userCollectionId: number): Set<number> => {
     return new Set(completedCards[userCollectionId] || []);
-  };
+  }, [completedCards]);
 
   const completeCard = async (userCollectionId: number, cardId: number, cardTitle: string, completionData: { date: Date; comment: string; collectionComment: string }) => {
     const { error } = await supabase
@@ -218,7 +223,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   };
 
   // Função para buscar comentários de uma coleção
-  const getCommentsForCollection = async (userCollectionId: number) => {
+  const getCommentsForCollection = useCallback(async (userCollectionId: number) => {
     if (!session) return [];
     
     const { data, error } = await supabase.rpc('get_collection_comments', {
@@ -233,10 +238,10 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     }
     
     return data || [];
-  };
+  }, [session]);
 
   // Função para buscar total de likes de uma coleção
-  const getLikesForCollection = async (userCollectionId: number) => {
+  const getLikesForCollection = useCallback(async (userCollectionId: number) => {
     if (!session) return 0;
     
     const { data, error } = await supabase.rpc('get_collection_likes', {
@@ -249,7 +254,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     }
     
     return data || 0;
-  };
+  }, [session]);
 
   const value = {
     loading,

@@ -5,7 +5,6 @@ import { CheckCircle2 } from "lucide-react";
 interface Card {
   id: number;
   title: string;
-  image?: string;
   cover?: string;
 }
 
@@ -31,8 +30,8 @@ const FriendCollectionPreviewModal = ({ collection, isOpen, onClose }: FriendCol
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-start">
           <div className="w-full">
             <img src={collection.cover} alt={collection.title} className="rounded-lg shadow-lg aspect-[9/14] object-cover w-full" />
           </div>
@@ -43,22 +42,15 @@ const FriendCollectionPreviewModal = ({ collection, isOpen, onClose }: FriendCol
             </DialogHeader>
             <div className="py-4 flex-grow">
               <h4 className="font-semibold mb-2">Progresso ({collection.completedCount}/{collection.totalCount}):</h4>
-              <ScrollArea className="h-64 rounded-md border p-4">
+              <ScrollArea className="h-48 md:h-64 rounded-md border p-4">
                 <ul className="space-y-3">
                   {collection.cards.map((card, index) => (
                     <li key={card.id} className={`flex items-center gap-3 text-sm ${collection.completedCardIds.has(card.id) ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
                       {collection.completedCardIds.has(card.id) ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
                       ) : (
-                        <span className="font-mono w-7 text-center flex-shrink-0">{index + 1}.</span>
-                      )}
-                      {card.image && (
-                        <div className="w-12 h-16 rounded-md overflow-hidden flex-shrink-0">
-                          <img 
-                            src={collection.completedCardIds.has(card.id) && card.cover ? card.cover : card.image} 
-                            alt={card.title}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="h-5 w-5 rounded-full border-2 border-muted-foreground flex-shrink-0 flex items-center justify-center">
+                          <span className="text-xs font-mono">{index + 1}</span>
                         </div>
                       )}
                       <span className="truncate">{card.title}</span>

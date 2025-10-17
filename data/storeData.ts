@@ -45,22 +45,10 @@ const streetPhotographyTitles = [
   "Retratos Anônimos", "Geometria das Ruas", "Cotidiano em Foco", "A Poesia do Acaso"
 ];
 
-// Store collections data
+// Store collections data - Only one collection available
 export const storeCollections = [
   {
-    id: 8,
-    title: "Fotografia de Rua",
-    subtitle: "Capturando a essência da vida urbana",
-    cover: "https://images.pexels.com/photos/161984/street-scene-people-street-scene-161984.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    cards: createCards(streetPhotographyTitles),
-    tags: ["Fotografia", "Arte", "Grátis"],
-    price: 0,
-    likes: 0,
-    acquisitions: 0,
-    createdAt: daysAgo(0),
-  },
-  {
-    id: 4,
+    id: 1,
     title: "Top 10 Jogos de Todos os Tempos",
     subtitle: "Uma seleção dos maiores clássicos",
     cover: "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -69,42 +57,6 @@ export const storeCollections = [
     price: 0,
     likes: 0,
     acquisitions: 0,
-    createdAt: daysAgo(3),
-  },
-  {
-    id: 5,
-    title: "Clássicos do Cinema",
-    subtitle: "Filmes que marcaram gerações",
-    cover: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    cards: createCards(movieTitles),
-    tags: ["Filmes", "Cultura"],
-    price: 9.99,
-    likes: 0,
-    acquisitions: 0,
-    createdAt: daysAgo(10),
-  },
-  {
-    id: 6,
-    title: "Maravilhas do Mundo",
-    subtitle: "Destinos que você precisa conhecer",
-    cover: "https://images.pexels.com/photos/21014/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    cards: createCards(worldWondersTitles),
-    tags: ["Viagens", "Aventura", "Grátis"],
-    price: 0,
-    likes: 0,
-    acquisitions: 0,
-    createdAt: daysAgo(30),
-  },
-  {
-    id: 7,
-    title: "Ficção Científica Essencial",
-    subtitle: "Livros que expandiram o universo",
-    cover: "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    cards: createCards(sciFiBooksTitles),
-    tags: ["Livros", "Cultura"],
-    price: 14.99,
-    likes: 0,
-    acquisitions: 0,
-    createdAt: daysAgo(1),
+    createdAt: daysAgo(0),
   }
 ];

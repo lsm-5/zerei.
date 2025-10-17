@@ -29,7 +29,7 @@ const AddFriendModal = ({ isOpen, onClose, onAddFriend }: AddFriendModalProps) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar Amigo</DialogTitle>
           <DialogDescription>

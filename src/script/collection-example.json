@@ -1,0 +1,70 @@
+{
+  "collection": {
+    "title": "Top 10 Jogos de Todos os Tempos",
+    "subtitle": "Uma seleção dos maiores clássicos",
+    "description": "Descubra os jogos que marcaram gerações e definiram a indústria dos videogames. Cada card representa um título icônico que todo gamer deveria conhecer.",
+    "cover": "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+  },
+  "cards": [
+    {
+      "title": "The Legend of Zelda: Ocarina of Time",
+      "description": "O épico de aventura que definiu o gênero action-RPG",
+      "order_index": 1,
+      "cover": "https://picsum.photos/seed/TheLegendofZeldaOcarinaofTime1/400/560"
+    },
+    {
+      "title": "Super Mario 64",
+      "description": "O primeiro jogo 3D do encanador mais famoso do mundo",
+      "order_index": 2,
+      "cover": "https://picsum.photos/seed/SuperMario642/400/560"
+    },
+    {
+      "title": "Chrono Trigger",
+      "description": "A obra-prima do RPG japonês com múltiplos finais",
+      "order_index": 3,
+      "cover": "https://picsum.photos/seed/ChronoTrigger3/400/560"
+    },
+    {
+      "title": "Final Fantasy VII",
+      "description": "O RPG que popularizou o gênero no ocidente",
+      "order_index": 4,
+      "cover": "https://picsum.photos/seed/FinalFantasyVII4/400/560"
+    },
+    {
+      "title": "Half-Life 2",
+      "description": "O FPS que revolucionou a narrativa em jogos",
+      "order_index": 5,
+      "cover": "https://picsum.photos/seed/HalfLife25/400/560"
+    },
+    {
+      "title": "Portal 2",
+      "description": "O puzzle game com humor e mecânicas únicas",
+      "order_index": 6,
+      "cover": "https://picsum.photos/seed/Portal26/400/560"
+    },
+    {
+      "title": "Red Dead Redemption 2",
+      "description": "O western épico com mundo aberto imersivo",
+      "order_index": 7,
+      "cover": "https://picsum.photos/seed/RedDeadRedemption27/400/560"
+    },
+    {
+      "title": "The Witcher 3: Wild Hunt",
+      "description": "O RPG de mundo aberto com narrativa excepcional",
+      "order_index": 8,
+      "cover": "https://picsum.photos/seed/TheWitcher3WildHunt8/400/560"
+    },
+    {
+      "title": "Minecraft",
+      "description": "O sandbox que conquistou o mundo",
+      "order_index": 9,
+      "cover": "https://picsum.photos/seed/Minecraft9/400/560"
+    },
+    {
+      "title": "Tetris",
+      "description": "O puzzle atemporal que nunca sai de moda",
+      "order_index": 10,
+      "cover": "https://picsum.photos/seed/Tetris10/400/560"
+    }
+  ]
+}

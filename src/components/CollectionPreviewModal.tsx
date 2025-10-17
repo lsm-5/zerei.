@@ -41,8 +41,8 @@ const CollectionPreviewModal = ({ collection, isOpen, onClose, onAcquire, showAc
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-start">
           <div className="w-full">
             <img 
               src={collection.cover} 
@@ -57,7 +57,7 @@ const CollectionPreviewModal = ({ collection, isOpen, onClose, onAcquire, showAc
             </DialogHeader>
             <div className="py-4 flex-grow">
               <h4 className="font-semibold mb-2">Cards nesta coleção:</h4>
-              <ScrollArea className="h-56 rounded-md border p-4">
+              <ScrollArea className="h-48 md:h-56 rounded-md border p-4">
                 <ul className="space-y-2">
                   {collection.cards.map((card, index) => (
                     <li key={card.id} className="flex items-center text-sm">

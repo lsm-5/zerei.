@@ -7,7 +7,6 @@ import { ptBR } from 'date-fns/locale';
 interface CardData {
   id: number;
   title: string;
-  image: string;
   cover?: string;
 }
 
@@ -27,7 +26,7 @@ const CollectionCardListItem = ({ card, number, isCompleted, onClick, completion
     >
       <div className="flex items-center gap-4">
         <img 
-          src={card.image} 
+          src={card.cover} 
           alt={card.title} 
           className="w-16 h-24 object-cover rounded-md shadow-sm"
         />

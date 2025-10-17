@@ -60,23 +60,25 @@ const Header = () => {
                 <AvatarFallback>{getInitials(user?.user_metadata.name)}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-72">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{getDisplayName(user?.user_metadata.name, user?.email)}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-sm font-medium leading-none break-words">
+                    {getDisplayName(user?.user_metadata.name, user?.email)}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground break-words">
                     {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <NavLink to="/config">
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem className="cursor-pointer py-2">
                   Configurações
                 </DropdownMenuItem>
               </NavLink>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="cursor-pointer focus:bg-red-100 focus:text-red-600">
+              <DropdownMenuItem onClick={logout} className="cursor-pointer focus:bg-red-100 focus:text-red-600 py-2">
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>

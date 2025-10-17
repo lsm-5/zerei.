@@ -26,14 +26,14 @@ const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCar
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-      <div className="text-center bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 p-3 rounded-md">
-        <p className="font-bold text-lg">Parabéns!</p>
-        <p className="text-sm">Você raspou a carta {completedCount}/{totalCount} da coleção.</p>
+    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 animate-fade-in">
+      <div className="text-center bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 p-2 md:p-3 rounded-md">
+        <p className="font-bold text-base md:text-lg">Parabéns!</p>
+        <p className="text-xs md:text-sm">Você raspou a carta {completedCount}/{totalCount} da coleção.</p>
       </div>
       <div className="space-y-1 pt-2">
-        <p className="text-sm font-medium text-muted-foreground">{subtitle}</p>
-        <h3 className="text-xl font-semibold">{title}</h3>
+        <p className="text-xs md:text-sm font-medium text-muted-foreground">{subtitle}</p>
+        <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
       </div>
       <div>
         <Label htmlFor="date">Data de Conclusão</Label>
@@ -46,29 +46,30 @@ const CompletionForm = ({ title, subtitle, completedCount, totalCount, isLastCar
           placeholder="Como foi sua experiência?"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          rows={3}
+          rows={2}
+          className="text-sm"
         />
         <p className="text-xs text-muted-foreground text-center pt-1">
           Sua experiência será exibida como descrição do post no feed.
         </p>
       </div>
       {isLastCard && (
-        <div className="animate-fade-in border-t pt-4">
-          <Label htmlFor="collection-comment" className="text-base font-semibold">Avaliação da Coleção</Label>
+        <div className="animate-fade-in border-t pt-3 md:pt-4">
+          <Label htmlFor="collection-comment" className="text-sm md:text-base font-semibold">Avaliação da Coleção</Label>
           <Textarea
             id="collection-comment"
             placeholder="Como foi sua experiência ao completar esta coleção?"
             value={collectionComment}
             onChange={(e) => setCollectionComment(e.target.value)}
-            rows={3}
-            className="mt-2"
+            rows={2}
+            className="mt-2 text-sm"
           />
           <p className="text-xs text-muted-foreground text-center pt-1">
             Sua avaliação aparecerá no feed e na página da coleção.
           </p>
         </div>
       )}
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full text-sm md:text-base">
         Salvar Progresso
       </Button>
     </form>

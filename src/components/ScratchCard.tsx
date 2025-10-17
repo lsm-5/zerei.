@@ -5,7 +5,6 @@ interface ScratchCardProps {
   card: {
     id: number;
     title: string;
-    image: string;
     cover?: string;
   };
   number?: number;
@@ -31,8 +30,12 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
 
     const dpr = window.devicePixelRatio || 1;
     const rect = container.getBoundingClientRect();
+    
+    // Set canvas size with proper scaling
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
 
     const context = canvas.getContext('2d');
     if (!context) return;
@@ -44,8 +47,19 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
 
   useEffect(() => {
     setupCanvas();
-    window.addEventListener('resize', setupCanvas);
-    return () => window.removeEventListener('resize', setupCanvas);
+    
+    // Handle resize and orientation change
+    const handleResize = () => {
+      setTimeout(setupCanvas, 100); // Small delay to ensure proper sizing
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, [showScratchLayer]);
 
   const getBrushPos = (x: number, y: number) => {
@@ -63,7 +77,9 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
 
     context.globalCompositeOperation = 'destination-out';
     
-    const radius = 50; // Large circular brush
+    // Responsive brush size based on screen size
+    const isMobile = window.innerWidth < 768;
+    const radius = isMobile ? 30 : 50; // Smaller brush on mobile
     
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI);
@@ -85,7 +101,11 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
     const totalPixels = (canvas.width * canvas.height) / ((window.devicePixelRatio || 1) ** 2);
     const percentage = (transparentPixels / totalPixels) * 100;
     
-    if (percentage > 60) {
+    // Responsive reveal percentage - easier on mobile
+    const isMobile = window.innerWidth < 768;
+    const requiredPercentage = isMobile ? 50 : 60;
+    
+    if (percentage > requiredPercentage) {
       setIsRevealed(true);
       onReveal?.();
     }
@@ -99,6 +119,7 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
 
   const handleTouchMove = (e: TouchEvent) => {
     if (!isScratchingRef.current) return;
+    e.preventDefault(); // Prevent scrolling while scratching
     const { x, y } = getBrushPos(e.touches[0].clientX, e.touches[0].clientY);
     scratch(x, y);
   };
@@ -121,9 +142,10 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
     const { x, y } = getBrushPos(clientX, clientY);
     scratch(x, y);
 
+    // Add passive: false for touch events to allow preventDefault
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleInteractionEnd);
-    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleInteractionEnd);
   };
 
@@ -153,18 +175,18 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
   return (
     <div 
       ref={containerRef} 
-      className="relative aspect-[9/14] w-full rounded-lg overflow-hidden shadow-lg"
+      className="relative aspect-[9/14] w-full max-w-sm mx-auto rounded-lg overflow-hidden shadow-lg"
       onMouseMove={handleParallaxMove}
       onMouseLeave={handleParallaxLeave}
     >
       <img 
-        src={isCompleted && card.cover ? card.cover : card.image} 
+        src={card.cover} 
         alt={card.title} 
         className="w-full h-full object-cover transition-transform duration-200 ease-out"
         style={{ transform: transform }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col items-center justify-end p-4 text-white text-center">
-        <h3 className="font-bold text-lg drop-shadow-md">{card.title}</h3>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col items-center justify-end p-3 md:p-4 text-white text-center">
+        <h3 className="font-bold text-sm md:text-lg drop-shadow-md">{card.title}</h3>
       </div>
 
       {number && (
@@ -176,20 +198,24 @@ const ScratchCard = ({ card, number, isCompleted = false, onReveal, scratchable 
       <div className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${showScratchLayer ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <canvas 
           ref={canvasRef} 
-          className={`w-full h-full ${scratchable ? 'cursor-crosshair' : ''}`}
+          className={`w-full h-full ${scratchable ? 'cursor-crosshair md:cursor-crosshair' : ''}`}
           onMouseDown={(e) => handleInteractionStart(e.clientX, e.clientY)}
-          onTouchStart={(e) => handleInteractionStart(e.touches[0].clientX, e.touches[0].clientY)}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleInteractionStart(e.touches[0].clientX, e.touches[0].clientY);
+          }}
+          style={{ touchAction: 'none' }} // Prevent default touch behaviors
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center pointer-events-none">
-          <Lock className="h-10 w-10 mb-4 text-muted-foreground" />
-          <h3 className="font-semibold text-foreground">{card.title}</h3>
-          <p className="text-sm text-muted-foreground mt-2">Raspe para revelar</p>
+          <Lock className="h-8 w-8 md:h-10 md:w-10 mb-3 md:mb-4 text-muted-foreground" />
+          <h3 className="font-semibold text-sm md:text-base text-foreground">{card.title}</h3>
+          <p className="text-xs md:text-sm text-muted-foreground mt-2">Raspe para revelar</p>
         </div>
       </div>
 
       {isCompleted && (
         <div className="absolute inset-0 bg-green-900/30 flex items-center justify-center">
-          <CheckCircle className="h-16 w-16 text-white/80" />
+          <CheckCircle className="h-12 w-12 md:h-16 md:w-16 text-white/80" />
         </div>
       )}
     </div>
