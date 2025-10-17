@@ -17,7 +17,6 @@ const CollectionsPage = () => {
   const { session } = useAuth();
   const [invites, setInvites] = useState<any[]>([]);
   const [loadingInvites, setLoadingInvites] = useState(false);
-  const [memberCollections, setMemberCollections] = useState<any[]>([]);
   const [showArchived, setShowArchived] = useState(false);
 
   const handleMenuClick = (e: React.MouseEvent) => {
@@ -87,34 +86,6 @@ const CollectionsPage = () => {
     fetchParticipantsForActive();
   }, [session, activeCollectionIds.join(',')]);
 
-  // Fetch instances where the user is a member (shared instances)
-  useEffect(() => {
-    const fetchMemberCollections = async () => {
-      if (!session) return;
-      const { data, error } = await supabase
-        .from('user_collection_members')
-        .select(`
-          user_collection_id,
-          user_collections:user_collections!inner (
-            id, is_public,
-            collections ( id, title, subtitle, cover, cards ( id, title, cover ) )
-          )
-        `)
-        .eq('user_id', session.user.id);
-      if (error) return;
-      const mapped = (data || []).map((row: any) => ({
-        instanceId: row.user_collections.id,
-        id: row.user_collections.collections.id,
-        title: row.user_collections.collections.title,
-        subtitle: row.user_collections.collections.subtitle,
-        cover: row.user_collections.collections.cover,
-        cards: row.user_collections.collections.cards || [],
-        isPublic: row.user_collections.is_public,
-      }));
-      setMemberCollections(mapped);
-    };
-    fetchMemberCollections();
-  }, [session]);
 
   const acceptInvite = async (inviteId: number) => {
     try {
@@ -123,29 +94,8 @@ const CollectionsPage = () => {
       showSuccess('Convite aceito!');
       // Remove invite from list (it will be accepted and disappear)
       setInvites(prev => prev.filter(i => i.id !== inviteId));
-      // Refresh member collections to show the new shared instance
-      const { data, error: memberError } = await supabase
-        .from('user_collection_members')
-        .select(`
-          user_collection_id,
-          user_collections:user_collections!inner (
-            id, is_public,
-            collections ( id, title, subtitle, cover, cards ( id, title, cover ) )
-          )
-        `)
-        .eq('user_id', session?.user.id);
-      if (!memberError && data) {
-        const mapped = data.map((row: any) => ({
-          instanceId: row.user_collections.id,
-          id: row.user_collections.collections.id,
-          title: row.user_collections.collections.title,
-          subtitle: row.user_collections.collections.subtitle,
-          cover: row.user_collections.collections.cover,
-          cards: row.user_collections.collections.cards || [],
-          isPublic: row.user_collections.is_public,
-        }));
-        setMemberCollections(mapped);
-      }
+      // Refresh the page to show the new shared instance
+      window.location.reload();
     } catch {
       showError('Erro ao aceitar convite.');
     }
@@ -324,12 +274,12 @@ const CollectionsPage = () => {
               </div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {renderCollectionGrid([...publicCollections, ...memberCollections.filter((c:any)=>c.isPublic)])}
+              {renderCollectionGrid(publicCollections)}
             </div>
           </TabsContent>
           <TabsContent value="private" className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {renderCollectionGrid([...privateCollections, ...memberCollections.filter((c:any)=>!c.isPublic)])}
+              {renderCollectionGrid(privateCollections)}
             </div>
           </TabsContent>
         </Tabs>

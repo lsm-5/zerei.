@@ -11,6 +11,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   
   const [storeCollections, setStoreCollections] = useState<any[]>([]);
   const [userCollections, setUserCollections] = useState<any[]>([]);
+  const [memberCollections, setMemberCollections] = useState<any[]>([]);
   const [completedCards, setCompletedCards] = useState<any>({});
   const [activities, setActivities] = useState<any[]>([]);
 
@@ -54,6 +55,13 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       .eq('user_id', session.user.id);
     
     if (memberCollectionsError) console.error('Error fetching member collections:', memberCollectionsError);
+    else {
+      const mappedMemberCollections = (memberCollectionsData || []).map((mc: any) => ({
+        ...mc.user_collections,
+        instanceId: mc.user_collection_id
+      }));
+      setMemberCollections(mappedMemberCollections);
+    }
 
     // Combine owned and member collections for completed cards and activities
     const allCollectionIds = [
@@ -122,9 +130,20 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   };
 
   const getCollectionById = useCallback((userCollectionId: number) => {
+    // First check owned collections
     const uc = userCollections.find(c => c.id === userCollectionId);
-    return uc ? { ...uc.collections, instanceId: uc.id, isPublic: uc.is_public, isArchived: uc.is_archived } : null;
-  }, [userCollections]);
+    if (uc) {
+      return { ...uc.collections, instanceId: uc.id, isPublic: uc.is_public, isArchived: uc.is_archived };
+    }
+    
+    // If not found in owned collections, check member collections
+    const mc = memberCollections.find(c => c.instanceId === userCollectionId);
+    if (mc) {
+      return { ...mc.collections, instanceId: mc.instanceId, isPublic: mc.is_public, isArchived: mc.is_archived };
+    }
+    
+    return null;
+  }, [userCollections, memberCollections]);
 
   const getCompletedCardsForCollection = useCallback((userCollectionId: number): Set<number> => {
     return new Set(completedCards[userCollectionId] || []);
@@ -295,8 +314,14 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     showSuccess("Coleção resetada com sucesso!");
   };
 
-  const activeCollections = userCollections.filter(c => !c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived }));
-  const archivedCollections = userCollections.filter(c => c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived }));
+  const activeCollections = [
+    ...userCollections.filter(c => !c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived })),
+    ...memberCollections.filter(c => !c.is_archived).map(c => ({ ...c.collections, instanceId: c.instanceId, isPublic: c.is_public, isArchived: c.is_archived }))
+  ];
+  const archivedCollections = [
+    ...userCollections.filter(c => c.is_archived).map(c => ({ ...c.collections, instanceId: c.id, isPublic: c.is_public, isArchived: c.is_archived })),
+    ...memberCollections.filter(c => c.is_archived).map(c => ({ ...c.collections, instanceId: c.instanceId, isPublic: c.is_public, isArchived: c.is_archived }))
+  ];
 
   // Funções para gerenciar likes de atividades
   const likeActivity = async (activityId: number) => {
