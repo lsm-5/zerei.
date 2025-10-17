@@ -14,7 +14,6 @@ interface Activity {
   activity_id: number;
   user_id: string;
   user_name: string;
-  user_email: string;
   user_avatar: string;
   type: 'acquired_collection' | 'completed_card' | 'completed_collection' | 'achievement_unlocked';
   collection_id: number;
@@ -236,7 +235,7 @@ const FeedPage = () => {
                     id: activity.activity_id,
                     user: {
                       id: parseInt(activity.user_id),
-                      name: getDisplayName(activity.user_name, activity.user_email),
+                      name: getDisplayName(activity.user_name, null),
                       avatar: activity.user_avatar || `https://api.dicebear.com/8.x/lorelei/svg?seed=${activity.user_id}`
                     },
                     type: activity.type,

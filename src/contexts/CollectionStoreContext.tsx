@@ -176,18 +176,44 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
   const completeCard = async (userCollectionId: number, cardId: number, cardTitle: string, completionData: { date: Date; comment: string; collectionComment: string }) => {
     if (!session) return;
 
-    // 1. Insert completed card
-    const { error } = await supabase
+    // 1. Check if card is already completed by ANY user
+    const { data: existingCompletion, error: checkError } = await supabase
       .from('user_completed_cards')
-      .insert({ user_collection_id: userCollectionId, card_id: cardId, completed_at: completionData.date.toISOString(), comment: completionData.comment });
+      .select('id, user_id')
+      .eq('user_collection_id', userCollectionId)
+      .eq('card_id', cardId)
+      .maybeSingle();
 
-    if (error) {
-      console.error('Error completing card:', error);
+    if (checkError) {
+      console.error('Error checking existing completion:', checkError);
+      showError("Erro ao verificar progresso.");
+      return;
+    }
+
+    if (existingCompletion) {
+      // Card already completed by someone
+      showError("Este card já foi completado por outro membro da coleção.");
+      return;
+    }
+
+    // 2. Insert new completion
+    const { error: insertError } = await supabase
+      .from('user_completed_cards')
+      .insert({ 
+        user_id: session.user.id,
+        user_collection_id: userCollectionId, 
+        card_id: cardId, 
+        completed_at: completionData.date.toISOString(), 
+        comment: completionData.comment 
+      });
+
+    if (insertError) {
+      console.error('Error completing card:', insertError);
       showError("Não foi possível salvar o progresso.");
       return;
     }
 
-    // 2. Get collection info
+    // 3. Get collection info
     const collection = userCollections.find(uc => uc.id === userCollectionId);
     if (!collection) return;
 
@@ -196,7 +222,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
     const newCompletedCount = currentCompletedCount + 1;
     const percentage = Math.floor((newCompletedCount / totalCards) * 100);
 
-    // 3. Check for achievement milestones (25%, 50%, 75%, 100%)
+    // 4. Check for achievement milestones (25%, 50%, 75%, 100%)
     const previousPercentage = Math.floor((currentCompletedCount / totalCards) * 100);
     const milestones = [25, 50, 75, 100];
     
@@ -237,7 +263,7 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       }
     }
 
-    // 4. Create completed_card activity (idempotent)
+    // 5. Create completed_card activity (idempotent)
     // Avoid duplicates if this function is called twice quickly
     const { data: existingCompleted, error: checkCompletedError } = await supabase
       .from('activities')
@@ -268,19 +294,38 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       }
     }
 
-    // 5. Update local state
+    // 6. Update local state immediately for instant UI feedback
     setCompletedCards(prev => ({ ...prev, [userCollectionId]: [...(prev[userCollectionId] || []), cardId] }));
+    
+    // 7. Show success message
     showSuccess(`Card "${cardTitle}" completado!`);
     
-    // 6. Show special message for milestones
+    // 8. Show special message for milestones
     if (percentage === 100 && previousPercentage < 100) {
       setTimeout(() => showSuccess("🎉 Parabéns! Você ZEROU a coleção!"), 500);
     } else if ([25, 50, 75].includes(percentage) && !milestones.includes(previousPercentage)) {
       setTimeout(() => showSuccess(`🏆 Conquista desbloqueada: ${percentage}%!`), 500);
     }
 
-    // 7. Refresh data to get new activities
-    await fetchData();
+    // 9. Refresh activities only (not completed cards to preserve instant UI update)
+    try {
+      const { data: activitiesData, error: activitiesError } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('user_collection_id', userCollectionId)
+        .order('created_at', { ascending: false });
+
+      if (!activitiesError && activitiesData) {
+        setActivities(prev => {
+          const filtered = prev.filter(activity => activity.user_collection_id !== userCollectionId);
+          return [...activitiesData, ...filtered].sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
+      }
+    } catch (error) {
+      console.error('Error refreshing activities:', error);
+    }
   };
   
   const archiveCollection = async (userCollectionId: number) => {
