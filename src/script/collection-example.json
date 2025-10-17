@@ -1,70 +1,226 @@
 {
   "collection": {
-    "title": "Top 10 Jogos de Todos os Tempos",
-    "subtitle": "Uma seleção dos maiores clássicos",
-    "description": "Descubra os jogos que marcaram gerações e definiram a indústria dos videogames. Cada card representa um título icônico que todo gamer deveria conhecer.",
-    "cover": "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    "title": "Chrono Trigger — Platina",
+    "subtitle": "Conquistas focadas em história e sidequests",
+    "description": "Roteiro para conquistar 100% de Chrono Trigger: principais marcos da história, sidequests opcionais e todos os finais — sem requisitos de Duas/Três-Techs.",
+    "cover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQym0tGay_VHA09KBmA6USGtWLqJrvhp4GI6Y92doh8otx72oUy3I8xmDIBTlMRfTWwRiri-5rk5MLTW23Z5dCK6jz99mhyyzmnnOqynu2s8_LMplsgqO3Yy2HUt_FWp6hfgPT05ZHCdE/rw/?imgmax=800"
   },
   "cards": [
     {
-      "title": "The Legend of Zelda: Ocarina of Time",
-      "description": "O épico de aventura que definiu o gênero action-RPG",
+      "title": "Despertar de Crono",
+      "description": "Conclua a introdução e chegue a 600 A.D.",
       "order_index": 1,
-      "cover": "https://picsum.photos/seed/TheLegendofZeldaOcarinaofTime1/400/560"
+      "cover": "https://pm1.aminoapps.com/6616/9680b65e7dab3e910200c46a6e74a77f197854ff_hq.jpg"
     },
     {
-      "title": "Super Mario 64",
-      "description": "O primeiro jogo 3D do encanador mais famoso do mundo",
+      "title": "Mestre das Eras",
+      "description": "Ative o End of Time como hub e desbloqueie as eras principais.",
       "order_index": 2,
-      "cover": "https://picsum.photos/seed/SuperMario642/400/560"
+      "cover": "https://picsum.photos/seed/ct_end_of_time/400/560"
     },
     {
-      "title": "Chrono Trigger",
-      "description": "A obra-prima do RPG japonês com múltiplos finais",
+      "title": "O Juramento do Herói",
+      "description": "Obtenha e purifique a Masamune com Frog.",
       "order_index": 3,
-      "cover": "https://picsum.photos/seed/ChronoTrigger3/400/560"
+      "cover": "https://picsum.photos/seed/ct_masamune_story/400/560"
     },
     {
-      "title": "Final Fantasy VII",
-      "description": "O RPG que popularizou o gênero no ocidente",
+      "title": "Castelo de Magus Conquistado",
+      "description": "Derrote Magus em 600 A.D. no seu castelo.",
       "order_index": 4,
-      "cover": "https://picsum.photos/seed/FinalFantasyVII4/400/560"
+      "cover": "https://picsum.photos/seed/ct_magus_castle/400/560"
     },
     {
-      "title": "Half-Life 2",
-      "description": "O FPS que revolucionou a narrativa em jogos",
+      "title": "Soberano do Oceano",
+      "description": "Conclua o Ocean Palace.",
       "order_index": 5,
-      "cover": "https://picsum.photos/seed/HalfLife25/400/560"
+      "cover": "https://picsum.photos/seed/ct_ocean_palace_story/400/560"
     },
     {
-      "title": "Portal 2",
-      "description": "O puzzle game com humor e mecânicas únicas",
+      "title": "O Retorno de Crono",
+      "description": "Reviva Crono usando o Crono Trigger.",
       "order_index": 6,
-      "cover": "https://picsum.photos/seed/Portal26/400/560"
+      "cover": "https://picsum.photos/seed/ct_crono_return/400/560"
     },
     {
-      "title": "Red Dead Redemption 2",
-      "description": "O western épico com mundo aberto imersivo",
+      "title": "Floresta de Fiona",
+      "description": "Elimine o deserto e restaure a floresta com Robo.",
       "order_index": 7,
-      "cover": "https://picsum.photos/seed/RedDeadRedemption27/400/560"
+      "cover": "https://picsum.photos/seed/ct_fiona_forest_story/400/560"
     },
     {
-      "title": "The Witcher 3: Wild Hunt",
-      "description": "O RPG de mundo aberto com narrativa excepcional",
+      "title": "O Sol Eterno",
+      "description": "Recupere a Sun Stone e transforme-a na Moon Stone.",
       "order_index": 8,
-      "cover": "https://picsum.photos/seed/TheWitcher3WildHunt8/400/560"
+      "cover": "https://picsum.photos/seed/ct_sunstone_story/400/560"
     },
     {
-      "title": "Minecraft",
-      "description": "O sandbox que conquistou o mundo",
+      "title": "Tesouro do Arco-Íris",
+      "description": "Complete a quest da Rainbow Shell e forje o equipamento Rainbow.",
       "order_index": 9,
-      "cover": "https://picsum.photos/seed/Minecraft9/400/560"
+      "cover": "https://picsum.photos/seed/ct_rainbow_shell_story/400/560"
     },
     {
-      "title": "Tetris",
-      "description": "O puzzle atemporal que nunca sai de moda",
+      "title": "Geno Dome",
+      "description": "Conclua o Geno Dome e descubra o passado de Robo.",
       "order_index": 10,
-      "cover": "https://picsum.photos/seed/Tetris10/400/560"
+      "cover": "https://picsum.photos/seed/ct_genodome_story/400/560"
+    },
+    {
+      "title": "Fortaleza de Ozzie",
+      "description": "Derrote Ozzie, Slash e Flea na Ozzie’s Fort.",
+      "order_index": 11,
+      "cover": "https://picsum.photos/seed/ct_ozzie_fort_story/400/560"
+    },
+    {
+      "title": "Marle e a Realeza",
+      "description": "Resolva o julgamento do Rei Guardia com a Rainbow Shell.",
+      "order_index": 12,
+      "cover": "https://picsum.photos/seed/ct_guardia_trial_story/400/560"
+    },
+    {
+      "title": "Salvem Lara",
+      "description": "Evite o acidente com a mãe de Lucca usando a senha correta.",
+      "order_index": 13,
+      "cover": "https://picsum.photos/seed/ct_lara_story/400/560"
+    },
+    {
+      "title": "Destinos Cruzados",
+      "description": "Poupe Magus no North Cape e mantenha-o no grupo.",
+      "order_index": 14,
+      "cover": "https://picsum.photos/seed/ct_spare_magus_story/400/560"
+    },
+    {
+      "title": "A Vingança de Frog",
+      "description": "Derrote Magus no North Cape (rota alternativa).",
+      "order_index": 15,
+      "cover": "https://picsum.photos/seed/ct_frog_duel_story/400/560"
+    },
+    {
+      "title": "Rainha das Sombras",
+      "description": "Derrote a Queen Zeal no Black Omen.",
+      "order_index": 16,
+      "cover": "https://picsum.photos/seed/ct_queen_zeal_story/400/560"
+    },
+    {
+      "title": "Tríplice Omen",
+      "description": "Derrube o Black Omen em 600 A.D., 1000 A.D. e 2300 A.D.",
+      "order_index": 17,
+      "cover": "https://picsum.photos/seed/ct_triple_omen_story/400/560"
+    },
+    {
+      "title": "Lavos do Omen",
+      "description": "Derrote Lavos após destruir o Black Omen.",
+      "order_index": 18,
+      "cover": "https://picsum.photos/seed/ct_lavos_omen_story/400/560"
+    },
+    {
+      "title": "Lavos do Balde",
+      "description": "Derrote Lavos acessando pelo ‘balde’ de 2300 A.D.",
+      "order_index": 19,
+      "cover": "https://picsum.photos/seed/ct_lavos_bucket_story/400/560"
+    },
+    {
+      "title": "Lavos do Palácio",
+      "description": "Enfrente Lavos no Ocean Palace (rota desafiadora).",
+      "order_index": 20,
+      "cover": "https://picsum.photos/seed/ct_lavos_palace_story/400/560"
+    },
+    {
+      "title": "Guardião do Tempo",
+      "description": "Derrote todas as formas de Spekkio pelo menos uma vez.",
+      "order_index": 21,
+      "cover": "https://picsum.photos/seed/ct_spekkio_story/400/560"
+    },
+    {
+      "title": "Mestre do Tempo",
+      "description": "Conclua todas as sidequests principais antes do confronto final.",
+      "order_index": 22,
+      "cover": "https://picsum.photos/seed/ct_sidequests_master/400/560"
+    },
+    {
+      "title": "Heróis Reunidos",
+      "description": "Recrute todos os personagens jogáveis (Crono, Marle, Lucca, Robo, Frog, Ayla e Magus).",
+      "order_index": 23,
+      "cover": "https://picsum.photos/seed/ct_heroes_late/400/560"
+    },
+    {
+      "title": "O Sonho do Tempo (Final 1)",
+      "description": "Finalize o jogo pelo final ‘Beyond Time’.",
+      "order_index": 24,
+      "cover": "https://picsum.photos/seed/ct_end1_story/400/560"
+    },
+    {
+      "title": "Reunião (Final 2)",
+      "description": "Obtenha o final ‘Reunion’.",
+      "order_index": 25,
+      "cover": "https://picsum.photos/seed/ct_end2_story/400/560"
+    },
+    {
+      "title": "O Projeto dos Sonhos (Final 3)",
+      "description": "Obtenha o final ‘The Dream Project’.",
+      "order_index": 26,
+      "cover": "https://picsum.photos/seed/ct_end3_story/400/560"
+    },
+    {
+      "title": "Sucessor de Guardia (Final 4)",
+      "description": "Obtenha o final ‘The Successor of Guardia’.",
+      "order_index": 27,
+      "cover": "https://picsum.photos/seed/ct_end4_story/400/560"
+    },
+    {
+      "title": "Boa Noite (Final 5)",
+      "description": "Obtenha o final ‘Good Night’.",
+      "order_index": 28,
+      "cover": "https://picsum.photos/seed/ct_end5_story/400/560"
+    },
+    {
+      "title": "O Juramento (Final 6)",
+      "description": "Obtenha o final ‘The Oath’.",
+      "order_index": 29,
+      "cover": "https://picsum.photos/seed/ct_end6_story/400/560"
+    },
+    {
+      "title": "Era dos Dinossauros (Final 7)",
+      "description": "Obtenha o final ‘Dino Age’.",
+      "order_index": 30,
+      "cover": "https://picsum.photos/seed/ct_end7_story/400/560"
+    },
+    {
+      "title": "O Que Procura o Profeta (Final 8)",
+      "description": "Obtenha o final ‘What the Prophet Seeks’.",
+      "order_index": 31,
+      "cover": "https://picsum.photos/seed/ct_end8_story/400/560"
+    },
+    {
+      "title": "Mudança de Coração (Final 9)",
+      "description": "Obtenha o final ‘A Change of Heart’.",
+      "order_index": 32,
+      "cover": "https://picsum.photos/seed/ct_end9_story/400/560"
+    },
+    {
+      "title": "Passado Desconhecido (Final 10)",
+      "description": "Obtenha o final ‘The Unknown Past’.",
+      "order_index": 33,
+      "cover": "https://picsum.photos/seed/ct_end10_story/400/560"
+    },
+    {
+      "title": "Povo das Eras (Final 11)",
+      "description": "Obtenha o final ‘People of the Times’.",
+      "order_index": 34,
+      "cover": "https://picsum.photos/seed/ct_end11_story/400/560"
+    },
+    {
+      "title": "A Lenda Continua (Final 12)",
+      "description": "Obtenha o final ‘The Legendary Hero’.",
+      "order_index": 35,
+      "cover": "https://picsum.photos/seed/ct_end12_story/400/560"
+    },
+    {
+      "title": "Epílogo dos Sonhos (Final 13)",
+      "description": "Obtenha o final ‘The Dream’s Epilogue’.",
+      "order_index": 36,
+      "cover": "https://picsum.photos/seed/ct_end13_story/400/560"
     }
   ]
 }

@@ -126,7 +126,8 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
         id: activity.id,
         type: activity.type,
         timestamp: activity.created_at,
-        comment: activity.metadata?.comment
+        comment: activity.metadata?.comment,
+        cardId: activity.card_id
       }));
   }, [activities]);
 
@@ -206,19 +207,35 @@ export const CollectionStoreProvider = ({ children }: { children: ReactNode }) =
       }
     }
 
-    // 4. Create completed_card activity
-    const { error: cardActivityError } = await supabase.from('activities').insert({
-      user_id: session.user.id,
-      user_collection_id: userCollectionId,
-      collection_id: collection.collections.id,
-      card_id: cardId,
-      type: 'completed_card',
-      metadata: { comment: completionData.comment }
-    });
+    // 4. Create completed_card activity (idempotent)
+    // Avoid duplicates if this function is called twice quickly
+    const { data: existingCompleted, error: checkCompletedError } = await supabase
+      .from('activities')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .eq('user_collection_id', userCollectionId)
+      .eq('card_id', cardId)
+      .eq('type', 'completed_card')
+      .maybeSingle();
 
-    if (cardActivityError) {
-      console.error('Error creating card activity:', cardActivityError);
-      console.log('Card activity data:', { user_id: session.user.id, user_collection_id: userCollectionId, card_id: cardId });
+    if (checkCompletedError) {
+      console.error('Error checking existing completed_card activity:', checkCompletedError);
+    }
+
+    if (!existingCompleted) {
+      const { error: cardActivityError } = await supabase.from('activities').insert({
+        user_id: session.user.id,
+        user_collection_id: userCollectionId,
+        collection_id: collection.collections.id,
+        card_id: cardId,
+        type: 'completed_card',
+        metadata: { comment: completionData.comment }
+      });
+
+      if (cardActivityError) {
+        console.error('Error creating card activity:', cardActivityError);
+        console.log('Card activity data:', { user_id: session.user.id, user_collection_id: userCollectionId, card_id: cardId });
+      }
     }
 
     // 5. Update local state

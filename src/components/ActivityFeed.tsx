@@ -6,16 +6,18 @@ import { ptBR } from 'date-fns/locale';
 
 interface Activity {
   id: string;
-  cardTitle: string;
+  type: string;
   timestamp: string;
   comment?: string;
+  cardId?: number;
 }
 
 interface ActivityFeedProps {
   activities: Activity[];
+  collection?: any;
 }
 
-const ActivityFeed = ({ activities }: ActivityFeedProps) => {
+const ActivityFeed = ({ activities, collection }: ActivityFeedProps) => {
   if (!activities || activities.length === 0) {
     return (
       <Card className="w-full max-w-md animate-fade-in">
@@ -36,32 +38,38 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
       </CardHeader>
       <CardContent>
         <ul className="space-y-6">
-          {activities.map((activity, index) => (
-            <li 
-              key={activity.id} 
-              className="flex items-start space-x-4 opacity-0 animate-slide-up"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <Avatar>
-                <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${activity.id}`} />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-sm">
-                  <span className="font-semibold">Você</span> completou o card{' '}
-                  <span className="font-semibold">{activity.cardTitle}</span>.
-                </p>
-                {activity.comment && (
-                  <p className="text-sm text-muted-foreground border-l-2 pl-3 my-1.5 italic">
-                    "{activity.comment}"
+          {activities.map((activity, index) => {
+            // Get card info from the collection
+            const cardInfo = collection?.cards?.find((c: any) => c.id === activity.cardId);
+            const cardTitle = cardInfo?.title || 'Card desconhecido';
+            
+            return (
+              <li 
+                key={activity.id} 
+                className="flex items-start space-x-4 opacity-0 animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <Avatar>
+                  <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${activity.id}`} />
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="text-sm">
+                    <span className="font-semibold">Você</span> completou o card{' '}
+                    <span className="font-semibold">{cardTitle}</span>.
                   </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: ptBR })}
-                </p>
-              </div>
-            </li>
-          ))}
+                  {activity.comment && (
+                    <p className="text-sm text-muted-foreground border-l-2 pl-3 my-1.5 italic">
+                      "{activity.comment}"
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: ptBR })}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </CardContent>
     </Card>
